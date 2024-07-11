@@ -1,0 +1,38 @@
+namespace OpenPose
+{
+    using System;
+
+    [Serializable]
+    public class FrameSkeletonsPoints3D
+    {
+        public int ID_Frame;
+        public string thingId;
+        public PeopleData[] People;
+    }
+
+    [Serializable]
+    public class PeopleData
+    {
+        public int personID;
+        public FaceRotation face_rotation;
+        public BoneData[] skeleton;
+    }
+
+    [Serializable]
+    public class FaceRotation
+    {
+        public float x;
+        public float y;
+        public float z;
+    }
+
+    [Serializable]
+    public class BoneData
+    {
+        public int pointID;
+        public float confidence;
+        public float x;
+        public float y;
+        public float z;
+    }
+}
