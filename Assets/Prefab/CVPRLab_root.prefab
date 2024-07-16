@@ -3546,8 +3546,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1.6588646, y: 1.3197562, z: 1.168886}
+  m_Center: {x: -0.051661868, y: -0.0035011107, z: 0.08444387}
 --- !u!1 &590679552840078980
 GameObject:
   m_ObjectHideFlags: 0
@@ -6342,7 +6342,7 @@ Transform:
   m_GameObject: {fileID: 1125103896346410956}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -30.228909, y: 2.9830718, z: -1.1269448}
+  m_LocalPosition: {x: 0, y: 2.9830718, z: 0}
   m_LocalScale: {x: 6.9607387, y: 0.00001, z: 6.093996}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15121,8 +15121,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.0909607, y: 1, z: 1.069737}
-  m_Center: {x: 0.5454837, y: 0, z: -0.03487002}
+  m_Size: {x: 1.6757004, y: 1, z: 1.069737}
+  m_Center: {x: 0.3378549, y: 0, z: -0.034870043}
 --- !u!1 &2701358246642778207
 GameObject:
   m_ObjectHideFlags: 0
@@ -33986,7 +33986,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2576013597520246312, guid: 7a55d708a8a52472f9e805f783b7eb78, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -35123,8 +35123,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.3705937, y: 1, z: 0.79633063}
-  m_Center: {x: 0.029941676, y: 0, z: 0.10183487}
+  m_Size: {x: 1.1749195, y: 1, z: 0.79633063}
+  m_Center: {x: -0.06789625, y: 0, z: 0.101834856}
 --- !u!1 &6112573192434342524
 GameObject:
   m_ObjectHideFlags: 0
@@ -41488,7 +41488,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6721137242621025034}
-  - component: {fileID: 4821468571215969467}
   m_Layer: 0
   m_Name: ColliderRotation
   m_TagString: Untagged
@@ -41512,27 +41511,6 @@ Transform:
   - {fileID: 8572872520856582616}
   m_Father: {fileID: 8011642612325093962}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &4821468571215969467
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6975345307372673385}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.1514993, y: 0.58894044, z: 3.0961926}
-  m_Center: {x: 6.4744463, y: -0.20552972, z: -12.72887}
 --- !u!1 &6980336431882846466
 GameObject:
   m_ObjectHideFlags: 0
@@ -43194,7 +43172,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2023295018618968814}
-  - component: {fileID: 6279975454510894664}
   m_Layer: 0
   m_Name: Smart TV-fbx (1)
   m_TagString: Untagged
@@ -43225,27 +43202,6 @@ Transform:
   - {fileID: 9029621251402398141}
   m_Father: {fileID: 8576619137924437527}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: -90}
---- !u!65 &6279975454510894664
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7348130420879070837}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1.6596978, z: 2.1385858}
-  m_Center: {x: 0, y: -0.32984847, z: -0.8599413}
 --- !u!1 &7395448874240919848
 GameObject:
   m_ObjectHideFlags: 0
@@ -51681,7 +51637,7 @@ Transform:
   m_GameObject: {fileID: 9122270002373273117}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -30.23, y: 0, z: -1.11}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.69646347, y: 1.0828, z: 0.6}
   m_ConstrainProportionsScale: 0
   m_Children:
