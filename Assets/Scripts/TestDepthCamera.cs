@@ -3,6 +3,7 @@ using UnityEngine;
 using System.IO;
 using System;
 using OpenPose;
+using System.Linq;
 
 public class TestDepthCamera : MonoBehaviour
 {
@@ -21,7 +22,9 @@ public class TestDepthCamera : MonoBehaviour
         var filePath = Path.Combine(Application.streamingAssetsPath, frameFileName);
         currentFrame = await filePath.ParseFromFileAsync<FrameSkeletonsPoints3D>();
 
-        foreach (var personData in currentFrame.People)
+        var personData = currentFrame.People.First();
+
+        if (personData != null)
         {
             var personObject = new GameObject();
             personObject.name = $"Person {personData.personID}";
