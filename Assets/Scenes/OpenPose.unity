@@ -130,10 +130,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6748422732257297421}
     m_Modifications:
-    - target: {fileID: 1125103896346410956, guid: c7bba129144dd6849bafb76b629fb552, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5650059247565877208, guid: c7bba129144dd6849bafb76b629fb552, type: 3}
       propertyPath: m_Name
       value: CVPRLab_root
