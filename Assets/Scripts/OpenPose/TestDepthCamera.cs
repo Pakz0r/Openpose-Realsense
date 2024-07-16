@@ -1,9 +1,9 @@
 using Utilities.Parser;
 using UnityEngine;
+using System.Linq;
 using System.IO;
 using System;
 using OpenPose;
-using System.Linq;
 
 public class TestDepthCamera : MonoBehaviour
 {
@@ -35,7 +35,7 @@ public class TestDepthCamera : MonoBehaviour
             foreach (var boneData in personData.skeleton)
             {
                 var boneObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                boneObject.name = $"Bone {boneData.pointID}";
+                boneObject.name = Enum.GetName(typeof(OpenPoseBone), boneData.pointID); //$"Bone {boneData.pointID}";
                 boneObject.transform.parent = personObject.transform;
                 boneObject.transform.SetLocalPositionAndRotation(new Vector3(boneData.x, boneData.y, boneData.z), Quaternion.identity);
                 boneObject.transform.localScale = Vector3.one * 0.05f;
