@@ -3,7 +3,6 @@
 // http://opensource.org/licenses/mit-license.php
 
 using UnityEngine;
-using System.Collections.Generic;
 
 namespace SA
 {
