@@ -1,18 +1,14 @@
 {
   "dependencies": {
-    "com.didimo.sdk.core": {
-      "version": "https://github.com/didimoinc/didimo-digital-human-unity-sdk.git?path=/com.didimo.sdk.core#5.0.1",
+    "com.unity.animation.rigging": {
+      "version": "1.2.1",
       "depth": 0,
-      "source": "git",
+      "source": "registry",
       "dependencies": {
-        "com.unity.nuget.newtonsoft-json": "2.0.2",
-        "com.unity.render-pipelines.universal": "10.5.0",
-        "com.unity.textmeshpro": "3.0.6",
-        "com.unity.editorcoroutines": "1.0.0",
-        "com.unity.cinemachine": "2.6.11",
-        "com.unity.timeline": "1.6.4"
+        "com.unity.burst": "1.4.1",
+        "com.unity.test-framework": "1.1.24"
       },
-      "hash": "754fafc1ff70bf3eea71cd04f3b24ecbd21e2d8a"
+      "url": "https://packages.unity.com"
     },
     "com.unity.burst": {
       "version": "1.8.16",
@@ -119,13 +115,6 @@
     },
     "com.unity.nuget.mono-cecil": {
       "version": "1.11.4",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.nuget.newtonsoft-json": {
-      "version": "3.2.1",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
