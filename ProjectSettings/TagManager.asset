@@ -5,10 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Roof
-  - 1
-  - 2
-  - 3
-  - 4
+  - Person
+  - Skeleton
   layers:
   - Default
   - TransparentFX

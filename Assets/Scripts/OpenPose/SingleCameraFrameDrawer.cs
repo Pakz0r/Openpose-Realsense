@@ -1,17 +1,20 @@
 using Utilities.Parser;
+using UnityEngine.Animations.Rigging;
 using UnityEngine;
 using System.Linq;
 using System.IO;
 using System;
 using OpenPose;
 
-public class TestDepthCamera : MonoBehaviour
+public class SingleCameraFrameDrawer : MonoBehaviour
 {
     #region Serialized Fields
     [SerializeField]
     private string frameFileName = "frame_skeletonsPoints3D.json";
     [SerializeField]
     private Transform skeletonRoot;
+    [SerializeField]
+    private Rig rigRoot;
     [SerializeField]
     private FrameSkeletonsPoints3D currentFrame;
     [SerializeField]
@@ -43,6 +46,7 @@ public class TestDepthCamera : MonoBehaviour
                     boneObject.transform.parent = personObject.transform;
                     boneObject.transform.SetLocalPositionAndRotation(new Vector3(boneData.x, boneData.y, boneData.z), Quaternion.identity);
                     boneObject.transform.localScale = Vector3.one * 0.05f;
+                    Debug.Log($"{boneObject.name} {boneObject.transform.position}");
                 }
             }
         }
