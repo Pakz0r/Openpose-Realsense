@@ -21,9 +21,9 @@ namespace OpenPose
     [Serializable]
     public class FaceRotation
     {
-        public float x;
-        public float y;
-        public float z;
+        public float pitch;
+        public float roll;
+        public float yaw;
     }
 
     [Serializable]

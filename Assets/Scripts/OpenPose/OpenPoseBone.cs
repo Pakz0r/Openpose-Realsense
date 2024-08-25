@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public enum OpenPoseBone {
     Head = 0,
     UpperChest = 1, // more torso ?
@@ -24,6 +26,7 @@ public enum OpenPoseBone {
     Unk5 = 22, // Right side nearby foot
     Unk6 = 23, // Right side nearby foot
     Unk7 = 24, // Right side nearby foot
+    Invalid = -1,
 }
 
 public enum OpenPoseBodyKeypoint
@@ -54,4 +57,24 @@ public enum OpenPoseBodyKeypoint
     RSmallToe = 23, 
     RHeel = 24,
     Background = 25
+}
+
+public static class OpenPoseBoneUtilities
+{
+    private static readonly Dictionary<OpenPoseBone, OpenPoseBone> lookAtDict = new()
+    {
+        [OpenPoseBone.RightShoulder] = OpenPoseBone.RightLowerArm,
+        [OpenPoseBone.RightLowerArm] = OpenPoseBone.RightHand,
+        [OpenPoseBone.LeftShoulder] = OpenPoseBone.LeftLowerArm,
+        [OpenPoseBone.LeftLowerArm] = OpenPoseBone.LeftHand,
+        [OpenPoseBone.RightUpperLeg] = OpenPoseBone.RightLowerLeg,
+        [OpenPoseBone.RightLowerLeg] = OpenPoseBone.RightFoot,
+        [OpenPoseBone.LeftUpperLeg] = OpenPoseBone.LeftLowerLeg,
+        [OpenPoseBone.LeftLowerLeg] = OpenPoseBone.LeftFoot,
+    };
+
+    public static OpenPoseBone GetLookAtBoneFrom(this OpenPoseBone bone)
+    {
+        return lookAtDict.GetValueOrDefault(bone, OpenPoseBone.Invalid);
+    }
 }

@@ -12,9 +12,9 @@ public class SingleCameraFrameDrawer : MonoBehaviour
     [SerializeField]
     private string frameFileName = "frame_skeletonsPoints3D.json";
     [SerializeField]
-    private Transform skeletonRoot;
+    private GameObject personPrefab;
     [SerializeField]
-    private Rig rigRoot;
+    private Transform skeletonRoot;
     [SerializeField]
     private FrameSkeletonsPoints3D currentFrame;
     [SerializeField]
@@ -29,24 +29,61 @@ public class SingleCameraFrameDrawer : MonoBehaviour
 
         var personData = currentFrame.People.First();
 
-        if (personData != null)
+        if (personData != null && personPrefab != null)
         {
-            var personObject = new GameObject();
+            // create person from prefab
+            var personObject = GameObject.Instantiate(personPrefab);
             personObject.name = $"Person {personData.personID}";
-            personObject.transform.parent = this.skeletonRoot;
-            personObject.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
-            personObject.transform.localScale = Vector3.one;
 
-            foreach (var boneData in personData.skeleton)
+            var personTransform = personObject.transform;
+            personTransform.parent = this.skeletonRoot;
+            personTransform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+            personTransform.localScale = Vector3.one;
+
+            if (personObject == null)
             {
-                if (boneData.confidence > minConfidence)
+                Debug.LogError("Cannot find person object");
+                return;
+            }
+
+            Rig personRig = personObject.GetComponentInChildren<Rig>();
+
+            if (personRig == null)
+            {
+                Debug.LogError("Invalid person rig");
+                return;
+            }
+            
+            // update rig position constraints
+            for (var childId = 0; childId < personRig.transform.childCount; childId++)
+            {
+                var boneObject = personRig.transform.GetChild(childId);
+
+                // get constraint gameobject
+                if (!boneObject.TryGetComponent<OverrideTransform>(out var constraint))
+                    continue;
+
+                // query skeleton data
+                foreach (var boneData in personData.skeleton)
                 {
-                    var boneObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    boneObject.name = Enum.GetName(typeof(OpenPoseBone), boneData.pointID); //$"Bone {boneData.pointID}";
-                    boneObject.transform.parent = personObject.transform;
-                    boneObject.transform.SetLocalPositionAndRotation(new Vector3(boneData.x, boneData.y, boneData.z), Quaternion.identity);
-                    boneObject.transform.localScale = Vector3.one * 0.05f;
-                    Debug.Log($"{boneObject.name} {boneObject.transform.position}");
+                    var boneId = (OpenPoseBone)boneData.pointID;
+                    var boneName = Enum.GetName(typeof(OpenPoseBone), boneData.pointID);
+
+                    if (boneObject.name == boneName)
+                    {
+                        constraint.weight = boneData.confidence;
+                        constraint.data.sourceObject.localPosition = new Vector3(boneData.x, boneData.y, boneData.z);
+
+                        switch (boneId)
+                        {
+                            case OpenPoseBone.Hips:
+                                var angle = Mathf.Rad2Deg * personData.face_rotation.yaw; // to degree
+                                constraint.data.sourceObject.localRotation = Quaternion.Euler(0.0f, angle, 0.0f);
+                                break;
+                        }
+
+                        break;
+                    }
                 }
             }
         }
