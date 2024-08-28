@@ -676,19 +676,19 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8952426603821725008}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7e864b6ad2ed02d49ae1809c5910efb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frameFileName: frame34_skeletonsPoints3D.json
+  frameFileName: frame24_skeletonsPoints3D.json
+  personPrefab: {fileID: 4717100028523145661, guid: b3d69e7604a93fa4b8ca46585d7fb456, type: 3}
   skeletonRoot: {fileID: 2047196534}
   currentFrame:
     ID_Frame: 0
     thingId: 
     People: []
   minConfidence: 0.5
-  personPrefab: {fileID: 4717100028523145661, guid: b3d69e7604a93fa4b8ca46585d7fb456, type: 3}
 --- !u!1 &2951313456314472887
 GameObject:
   m_ObjectHideFlags: 0
@@ -1004,6 +1004,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8896560683380119180}
   - component: {fileID: 2484676135746363554}
+  - component: {fileID: 8952426603821725009}
   m_Layer: 0
   m_Name: DepthCamera_1
   m_TagString: Untagged
@@ -1011,6 +1012,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &8952426603821725009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8952426603821725008}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfe3fe91b12d11c4b9d01b9c3f3fa245, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  personPrefab: {fileID: 4717100028523145661, guid: b3d69e7604a93fa4b8ca46585d7fb456, type: 3}
+  skeletonRoot: {fileID: 2047196534}
+  minConfidence: 0.5
+  currentFrame:
+    ID_Frame: 0
+    thingId: 
+    People: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

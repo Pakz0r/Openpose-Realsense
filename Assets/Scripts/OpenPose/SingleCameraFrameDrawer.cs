@@ -1,10 +1,10 @@
-using Utilities.Parser;
-using UnityEngine.Animations.Rigging;
-using UnityEngine;
-using System.Linq;
-using System.IO;
-using System;
 using OpenPose;
+using System;
+using System.IO;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.Animations.Rigging;
+using Utilities.Parser;
 
 public class SingleCameraFrameDrawer : MonoBehaviour
 {
@@ -22,7 +22,7 @@ public class SingleCameraFrameDrawer : MonoBehaviour
     #endregion
 
     #region Unity Lifecylce
-    private async void Awake()
+    private async void OnEnable()
     {
         var filePath = Path.Combine(Application.streamingAssetsPath, frameFileName);
         currentFrame = await filePath.ParseFromFileAsync<FrameSkeletonsPoints3D>();
@@ -35,9 +35,19 @@ public class SingleCameraFrameDrawer : MonoBehaviour
             var personObject = GameObject.Instantiate(personPrefab);
             personObject.name = $"Person {personData.personID}";
 
+            // set person object parent root
             var personTransform = personObject.transform;
             personTransform.parent = this.skeletonRoot;
-            personTransform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+            var hipBoneData = personData.skeleton.FirstOrDefault(bone => bone.pointID == (int)OpenPoseBone.Hips);
+            var rigPosition = new Vector3(hipBoneData.x, hipBoneData.y, hipBoneData.z);
+
+            // eval rig rotation from face rotation
+            var angle = Mathf.Rad2Deg * personData.face_rotation.yaw; // to degree
+            var rigRotation = Quaternion.Euler(0.0f, angle, 0.0f);
+
+            // update person transform
+            personTransform.SetLocalPositionAndRotation(rigPosition, rigRotation);
             personTransform.localScale = Vector3.one;
 
             if (personObject == null)
@@ -53,7 +63,7 @@ public class SingleCameraFrameDrawer : MonoBehaviour
                 Debug.LogError("Invalid person rig");
                 return;
             }
-            
+
             // update rig position constraints
             for (var childId = 0; childId < personRig.transform.childCount; childId++)
             {
@@ -72,13 +82,55 @@ public class SingleCameraFrameDrawer : MonoBehaviour
                     if (boneObject.name == boneName)
                     {
                         constraint.weight = boneData.confidence;
-                        constraint.data.sourceObject.localPosition = new Vector3(boneData.x, boneData.y, boneData.z);
+                        constraint.data.sourceObject.localPosition = new Vector3(boneData.x, boneData.y, boneData.z) - rigPosition;
+                        break;
+                    }
+                }
+            }
+
+            // update rig rotation constraints
+            for (var childId = 0; childId < personRig.transform.childCount; childId++)
+            {
+                var boneObject = personRig.transform.GetChild(childId);
+
+                if (!Enum.TryParse<OpenPoseBone>(boneObject.name, true, out var boneId))
+                    continue;
+
+                // check for bone to look at
+                var boneTargetId = boneId.GetLookAtBoneFrom();
+                if (boneTargetId == OpenPoseBone.Invalid)
+                    continue;
+
+                // get constraint gameobject
+                if (!boneObject.TryGetComponent<OverrideTransform>(out var constraint))
+                    continue;
+
+                var boneTargetName = Enum.GetName(typeof(OpenPoseBone), boneTargetId);
+
+                // query rig childs transforms
+                for (var targetId = 0; targetId < personRig.transform.childCount; targetId++)
+                {
+                    var boneTargetObject = personRig.transform.GetChild(targetId);
+                    
+                    if(boneTargetObject.name == boneTargetName)
+                    {
+                        constraint.data.sourceObject.LookAt(boneTargetObject);
 
                         switch (boneId)
                         {
-                            case OpenPoseBone.Hips:
-                                var angle = Mathf.Rad2Deg * personData.face_rotation.yaw; // to degree
-                                constraint.data.sourceObject.localRotation = Quaternion.Euler(0.0f, angle, 0.0f);
+                            case OpenPoseBone.LeftShoulder:
+                                // upper left side is specular on Y asix
+                                constraint.data.sourceObject.Rotate(Vector3.up, 180f);
+                                break;
+                            case OpenPoseBone.LeftLowerArm:
+                                // upper left side is specular on Y asix
+                                constraint.data.sourceObject.Rotate(Vector3.up, 180f);
+                                break;
+
+                            case OpenPoseBone.RightUpperLeg:
+                            case OpenPoseBone.LeftUpperLeg:
+                                // lower side is specular on X asix
+                                constraint.data.sourceObject.Rotate(Vector3.right, 180f);
                                 break;
                         }
 
