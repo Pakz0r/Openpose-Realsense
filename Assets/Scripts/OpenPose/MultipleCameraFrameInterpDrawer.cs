@@ -24,12 +24,17 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
 
     #region Private Fields
     private Dictionary<string, GameObject> peoples = new();
+    private FrameSkeletonsPoints3D processedFrame = new();
+    private FrameSkeletonsPoints3D lastFrame = new();
+    private float interpolationTime = 1f;
     #endregion
 
     #region Unity Lifecycle
     private void OnEnable()
     {
         StartCoroutine(ReadFrames());
+        StartCoroutine(DrawPersons());
+        StartCoroutine(InterpolateFrames());
     }
     #endregion
 
@@ -39,18 +44,111 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
         for (int i = 0; i < 34; i++)
         {
             var filePath = Path.Combine(Application.streamingAssetsPath, $"frame{i}_skeletonsPoints3D.json");
-            _ = DrawPeoplesFromFrame(filePath);
+            _ = ReadNewFrameFromPath(filePath);
             yield return new WaitForSeconds(2f);
         }
     }
 
-    private async Task DrawPeoplesFromFrame(string filePath)
+    private IEnumerator DrawPersons()
     {
+        while (true)
+        {
+            if (processedFrame != null && processedFrame.People != null)
+            {
+                foreach (var person in processedFrame.People)
+                {
+                    // retrieve person data from processed frame
+                    DrawPerson(person);
+                }
+            }
+
+            yield return null;
+        }
+    }
+
+    private IEnumerator InterpolateFrames()
+    {
+        while (true)
+        {
+            if (interpolationTime < 1.0f)
+            {
+                interpolationTime += Time.deltaTime;
+
+                processedFrame.ID_Frame = currentFrame.ID_Frame;
+                processedFrame.thingId = currentFrame.thingId;
+                processedFrame.People = new PeopleData[currentFrame.People.Length];
+
+                for (int i = 0; i < currentFrame.People.Length; i++)
+                {
+                    processedFrame.People[i] = new PeopleData();
+                    var person = processedFrame.People[i];
+                    var current = currentFrame.People[i];
+
+                    // force assign data on person first time see
+                    if(i >= lastFrame.People.Length)
+                    {
+                        processedFrame.People[i] = current;
+                        continue;
+                    }
+
+                    var last = lastFrame.People[i];
+
+                    person.personID = current.personID;
+
+                    if (last.face_rotation != null)
+                    {
+                        // interpolate face rotation axis
+                        person.face_rotation = new FaceRotation()
+                        {
+                            yaw = Mathf.Lerp(last.face_rotation.yaw, current.face_rotation.yaw, interpolationTime),
+                            pitch = Mathf.Lerp(last.face_rotation.pitch, current.face_rotation.pitch, interpolationTime),
+                            roll = Mathf.Lerp(last.face_rotation.roll, current.face_rotation.roll, interpolationTime),
+                        };
+                    }
+                    else
+                    {
+                        person.face_rotation = current.face_rotation;
+                    }
+
+
+                    person.skeleton = new BoneData[current.skeleton.Length];
+
+                    // interpolate bone positions
+                    for (int j = 0; j < current.skeleton.Length; j++)
+                    {
+                        person.skeleton[j] = new BoneData();
+                        var bone = person.skeleton[j];
+                        bone.pointID = current.skeleton[j].pointID;
+                        bone.confidence = Mathf.Lerp(last.skeleton[j].confidence, current.skeleton[j].confidence, interpolationTime);
+                        bone.x = Mathf.Lerp(last.skeleton[j].x, current.skeleton[j].x, interpolationTime);
+                        bone.y = Mathf.Lerp(last.skeleton[j].y, current.skeleton[j].y, interpolationTime);
+                        bone.z = Mathf.Lerp(last.skeleton[j].z, current.skeleton[j].z, interpolationTime);
+                    }
+                }
+            }
+
+            yield return null;
+        }
+    }
+
+    private async Task ReadNewFrameFromPath(string filePath)
+    {
+        // save last frame for interpolation
+        lastFrame = currentFrame;
+
         // read current frame from file path
         currentFrame = await filePath.ParseFromFileAsync<FrameSkeletonsPoints3D>();
 
-        // retrieve person data from frame
-        DrawPerson(currentFrame.People.First());
+        // force first frame to be the processed frame
+        if (lastFrame == null || String.IsNullOrEmpty(lastFrame.thingId))
+        {
+            interpolationTime = 1.0f;
+            processedFrame = currentFrame;
+            return;
+        }
+
+        // reset the interpolation time
+        interpolationTime = 0;
     }
 
     private void DrawPerson(PeopleData personData)
