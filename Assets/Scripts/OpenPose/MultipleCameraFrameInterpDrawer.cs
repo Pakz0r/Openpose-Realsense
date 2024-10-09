@@ -1,13 +1,14 @@
-using OpenPose;
-using System;
-using System.Linq;
-using System.Collections;
-using System.Threading.Tasks;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Animations.Rigging;
-using Utilities.Parser;
+using System.Threading.Tasks;
+using System.Collections;
+using System.Linq;
 using System.IO;
+using System;
+using UnityEngine.Animations.Rigging;
+using UnityEngine;
+using MathNet.Numerics.LinearAlgebra;
+using Utilities.Parser;
+using OpenPose;
 
 public class MultipleCameraFrameInterpDrawer : MonoBehaviour
 {
@@ -85,7 +86,7 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
                     var current = currentFrame.People[i];
 
                     // force assign data on person first time see
-                    if(i >= lastFrame.People.Length)
+                    if (i >= lastFrame.People.Length)
                     {
                         processedFrame.People[i] = current;
                         continue;
@@ -168,7 +169,7 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
             return;
         }
 
-        UpdatePersonObjectTransform(personObject, personData.skeleton, personData.face_rotation);
+        UpdatePersonObjectTransform(personObject, personData.skeleton, personData.face_rotation, minConfidence);
 
         // get person object rig
         Rig personRig = personObject.GetComponentInChildren<Rig>();
@@ -183,7 +184,7 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
         UpdateRigRotationConstraints(personRig);
     }
 
-    private void UpdateRigRotationConstraints(Rig personRig)
+    private static void UpdateRigRotationConstraints(Rig personRig)
     {
         for (var childId = 0; childId < personRig.transform.childCount; childId++)
         {
@@ -236,8 +237,10 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
         }
     }
 
-    private void UpdateRigPositionConstraints(Rig personRig, BoneData[] skeleton, Vector3 rigPosition)
+    private static void UpdateRigPositionConstraints(Rig personRig, BoneData[] skeleton, Vector3 rigPosition)
     {
+        var animator = personRig.GetComponent<Animator>();
+
         for (var childId = 0; childId < personRig.transform.childCount; childId++)
         {
             var boneObject = personRig.transform.GetChild(childId);
@@ -254,7 +257,7 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
 
                 if (boneObject.name == boneName)
                 {
-                    constraint.weight = boneData.confidence;
+                    constraint.weight = EvalWeight(constraint.weight, boneData.confidence);
                     constraint.data.sourceObject.localPosition = new Vector3(boneData.x, boneData.y, boneData.z) - rigPosition;
                     break;
                 }
@@ -262,7 +265,7 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
         }
     }
 
-    private void UpdatePersonObjectTransform(GameObject personObject, BoneData[] skeleton, FaceRotation rotation)
+    private static void UpdatePersonObjectTransform(GameObject personObject, BoneData[] skeleton, FaceRotation rotation, float minConfidence)
     {
         var personTransform = personObject.transform;
 
@@ -293,6 +296,12 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
         // update person transform
         personTransform.SetLocalPositionAndRotation(rigPosition, rigRotation);
         personTransform.localScale = Vector3.one;
+
+        // eval rig rotation from plane interpolation
+        // Calcola la normale del piano e il centro
+        // (Vector3 normal, Vector3 centroid) = FitPlane(skeleton);
+        // normal = Vector3.ProjectOnPlane(normal, Vector3.down); // force normal to point forward
+        // personTransform.forward = normal;
     }
 
     private GameObject CreatePersonIfNotExists(int personID)
@@ -309,7 +318,7 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
 
     private GameObject CreatePerson(int personID)
     {
-        if (personPrefab == null) 
+        if (personPrefab == null)
             return null;
 
         // create person from prefab
@@ -319,6 +328,89 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
         // set person object parent root
         personObject.transform.parent = this.skeletonRoot;
         return personObject;
+    }
+
+    // Approccio Bayesiano (aggiornamento con prior)
+    private static float EvalWeight(float currentWeight, float confidence)
+    {
+        //Un approccio elegante per aggiornare il peso potrebbe essere quello di usare un metodo Bayesiano.
+        //Considera il peso al tempo (t-1) come un prior(una stima iniziale) e aggiorna il peso in base alla nuova confidence.
+        //Questo approccio aggiorna il peso combinando l'informazione precedente (prior) e quella nuova (likelihood) in maniera ottimale.
+        //Se la confidence corrente è alta, il peso si aggiorna verso l'alto; se è bassa, il peso si riduce.
+        //Al passo t0 (sul prefab) il peso è 0.5.
+        return (currentWeight * confidence) / (currentWeight * confidence + (1 - currentWeight) * (1 - confidence));
+    }
+
+    private static (Vector3 normal, Vector3 centroid) FitPlane(BoneData[] skeleton)
+    {
+        // Matrici per accumulare i valori
+        float sumWeight = 0;
+        float sumWX = 0, sumWY = 0, sumWZ = 0;
+        float sumWXX = 0, sumWYY = 0, sumWZZ = 0;
+        float sumWXY = 0, sumWXZ = 0, sumWYZ = 0;
+
+        foreach (var bone in skeleton)
+        {
+            // Accumulo delle somme pesate
+            sumWeight += bone.confidence;
+            sumWX += bone.confidence * bone.x;
+            sumWY += bone.confidence * bone.y;
+            sumWZ += bone.confidence * bone.z;
+
+            sumWXX += bone.confidence * bone.x * bone.x;
+            sumWYY += bone.confidence * bone.y * bone.y;
+            sumWZZ += bone.confidence * bone.z * bone.z;
+            sumWXY += bone.confidence * bone.x * bone.y;
+            sumWXZ += bone.confidence * bone.x * bone.z;
+            sumWYZ += bone.confidence * bone.y * bone.z;
+        }
+
+        // Calcola il baricentro ponderato (centroid)
+        Vector3 centroid = new(sumWX / sumWeight, sumWY / sumWeight, sumWZ / sumWeight);
+
+        // Matrice di covarianza pesata (3x3)
+        float[,] A = new float[3, 3];
+        A[0, 0] = sumWXX - (sumWX * sumWX) / sumWeight;
+        A[0, 1] = sumWXY - (sumWX * sumWY) / sumWeight;
+        A[0, 2] = sumWXZ - (sumWX * sumWZ) / sumWeight;
+        A[1, 0] = A[0, 1]; // Simmetria
+        A[1, 1] = sumWYY - (sumWY * sumWY) / sumWeight;
+        A[1, 2] = sumWYZ - (sumWY * sumWZ) / sumWeight;
+        A[2, 0] = A[0, 2]; // Simmetria
+        A[2, 1] = A[1, 2]; // Simmetria
+        A[2, 2] = sumWZZ - (sumWZ * sumWZ) / sumWeight;
+
+        // Trova la normale come l'autovettore corrispondente al più piccolo autovalore
+        Vector3 normal = FindSmallestEigenVector(A);
+
+        // Restituisci sia la normale che il baricentro
+        return (normal, centroid);
+    }
+
+    // Funzione per trovare l'autovettore corrispondente al più piccolo autovalore
+    private static Vector3 FindSmallestEigenVector(float[,] A)
+    {
+        // Converte la matrice float[,] in una matrice compatibile con MathNet
+        var matrix = Matrix<float>.Build.DenseOfArray(A);
+
+        // Calcola l'operazione di autovalore/autovettore
+        var evd = matrix.Evd();
+
+        // Trova l'autovalore più piccolo
+        var eigenValues = evd.EigenValues.Real(); // Prendi solo la parte reale degli autovalori
+        int minIndex = 0;
+
+        for (int i = 1; i < eigenValues.Count; i++)
+        {
+            if (eigenValues[i] < eigenValues[minIndex])
+                minIndex = i;
+        }
+
+        // Ottieni l'autovettore associato al più piccolo autovalore
+        var smallestEigenVector = evd.EigenVectors.Column(minIndex);
+
+        // Restituisce la normale come un Vector3
+        return Vector3.Normalize(new Vector3(smallestEigenVector[0], smallestEigenVector[1], smallestEigenVector[2]));
     }
     #endregion
 }

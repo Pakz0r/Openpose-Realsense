@@ -12,7 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/NetworkScene.unity
     guid: 0b8700b7b1b34534b951f0708ff95a16
   m_configObjects:
-    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 290a6e6411d135049940bec2237b8938, type: 2}
+    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: cbad3e06f94856948a704ad24dc4966b, type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: 9e7be553448fa2546aea5752021cbcf7, type: 2}
-    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 4c1640683c539c14080cfd43fbeffbda, type: 2}
+    com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 44ecc7b6edcd4a14fba3665d55678e3b, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: ebcf1c5eaa815b8409b2488b087a945f, type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: e896fbf21c09ecb4e9abb8b423537e64, type: 2}
     xr.sdk.mock-hmd.settings: {fileID: 11400000, guid: 9e9f2958d1b4b4642ace1d0c7770650b, type: 2}
