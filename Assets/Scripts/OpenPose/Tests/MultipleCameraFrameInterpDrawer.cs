@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Collections;
 using System.Linq;
 using System.IO;
@@ -45,7 +44,7 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
         for (int i = 0; i < 34; i++)
         {
             var filePath = Path.Combine(Application.streamingAssetsPath, $"frame{i}_skeletonsPoints3D.json");
-            _ = ReadNewFrameFromPath(filePath);
+            ReadNewFrameFromPath(filePath);
             yield return new WaitForSeconds(2f);
         }
     }
@@ -132,7 +131,7 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
         }
     }
 
-    private async Task ReadNewFrameFromPath(string filePath)
+    private async void ReadNewFrameFromPath(string filePath)
     {
         // save last frame for interpolation
         lastFrame = currentFrame;
@@ -239,8 +238,6 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
 
     private static void UpdateRigPositionConstraints(Rig personRig, BoneData[] skeleton, Vector3 rigPosition)
     {
-        var animator = personRig.GetComponent<Animator>();
-
         for (var childId = 0; childId < personRig.transform.childCount; childId++)
         {
             var boneObject = personRig.transform.GetChild(childId);

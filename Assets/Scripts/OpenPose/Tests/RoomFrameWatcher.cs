@@ -24,8 +24,8 @@ public class RoomFrameWatcher : MonoBehaviour
 
     #region Private Fields
     private FileSystemWatcher watcher;
-    private static Dictionary<string, FrameSkeletonsPoints3D> roomFrames = new Dictionary<string, FrameSkeletonsPoints3D>();
-    private static Dictionary<string, Transform> roomTransform = new Dictionary<string, Transform>();
+    private static Dictionary<string, FrameSkeletonsPoints3D> roomFrames = new();
+    private static Dictionary<string, Transform> roomTransform = new();
     private static int roomGridRowIndex = -1;
     private static int roomGridColumnIndex;
     #endregion
@@ -150,7 +150,7 @@ public class RoomFrameWatcher : MonoBehaviour
     {
         for (int i = 0; i < roomTransform[roomName].childCount; i++)
         {
-            GameObject.Destroy(roomTransform[roomName].GetChild(i));
+            Destroy(roomTransform[roomName].GetChild(i).gameObject);
         }
 
         foreach (var personData in roomFrames[roomName].People)
