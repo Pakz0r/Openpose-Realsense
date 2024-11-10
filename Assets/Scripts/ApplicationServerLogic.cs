@@ -38,6 +38,10 @@ public class ApplicationServerLogic : MonoBehaviour
             return;
         }
 
+        // eval frame confidence
+        var avgConfidence = personData.skeleton.Average((bone) => bone.confidence);
+        Debug.Log($"Person {personData.personID} new frame average confidence: {avgConfidence}");
+
         // create person if not exists
         var personObject = CreatePersonIfNotExists(personData.personID);
 
@@ -47,11 +51,11 @@ public class ApplicationServerLogic : MonoBehaviour
             return;
         }
 
-        // set person object parent root
+        // update person transform parent
         personObject.transform.SetParent(sender.transform);
 
         // update person transform
-        UpdatePersonObjectTransform(personObject, personData.skeleton, personData.face_rotation, ApplicationLogic.Config.MinConfidence);
+        UpdatePersonObjectTransform(personObject, personData.skeleton, personData.face_rotation);
 
         // get person object rig
         Rig personRig = personObject.GetComponentInChildren<Rig>();
@@ -94,7 +98,7 @@ public class ApplicationServerLogic : MonoBehaviour
         return personObject;
     }
 
-    private static void UpdatePersonObjectTransform(GameObject personObject, BoneData[] skeleton, FaceRotation rotation, float minConfidence)
+    private static void UpdatePersonObjectTransform(GameObject personObject, BoneData[] skeleton, FaceRotation rotation)
     {
         var personTransform = personObject.transform;
 
@@ -103,7 +107,7 @@ public class ApplicationServerLogic : MonoBehaviour
         var rigPosition = personTransform.localPosition;
 
         // update rigPosition only if confidence is over minimum
-        if (hipBoneData != null && hipBoneData.confidence > minConfidence)
+        if (hipBoneData != null && hipBoneData.confidence > ApplicationLogic.Config.MinConfidence)
         {
             rigPosition = new Vector3(hipBoneData.x, hipBoneData.y, hipBoneData.z);
         }
@@ -112,7 +116,7 @@ public class ApplicationServerLogic : MonoBehaviour
             // try eval rig position from head bone
             var headBoneData = skeleton.FirstOrDefault(bone => bone.pointID == (int)OpenPoseBone.Head);
 
-            if (headBoneData != null && headBoneData.confidence > minConfidence)
+            if (headBoneData != null && headBoneData.confidence > ApplicationLogic.Config.MinConfidence)
             {
                 rigPosition = new Vector3(headBoneData.x, 0.0f, headBoneData.z);
             }
