@@ -14,12 +14,19 @@ public class ApplicationServerLogic : MonoBehaviour
     #endregion
 
     #region Private Fields
+    private NetworkManager networkManager;
     private Dictionary<string, GameObject> peoples = new();
     #endregion
 
     #region Unity Lifecycle
     private void OnEnable()
     {
+        networkManager = ApplicationLogic.GetNetworkManager();
+
+        if (networkManager == null)
+            return;
+
+        networkManager.StartServer();
         SensorWatcher.OnPersonUpdate.AddListener(DrawPerson);
     }
 

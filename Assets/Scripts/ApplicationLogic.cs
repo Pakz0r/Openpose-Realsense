@@ -36,11 +36,15 @@ public class ApplicationLogic : MonoBehaviour
     #region Public Fields
     public static ApplicationMode Mode { get; private set; }
     public static ApplicationConfig Config { get; private set; }
+    public static ApplicationLogic Instance { get; private set; }
     #endregion
 
     #region Unity Lifecycle
     private async void OnEnable()
     {
+        if (Instance == null)
+            Instance = this;
+
         // setup scene loading
         SceneManager.sceneLoaded += OnSceneLoaded;
 
@@ -60,37 +64,34 @@ public class ApplicationLogic : MonoBehaviour
             Mode = applicationMode;
         }
 
-        if (!string.IsNullOrEmpty(Config.EnvironmentScene))
+        if (!string.IsNullOrEmpty(Config.EnvironmentScene) && !IsSceneLoaded(Config.EnvironmentScene))
+            SceneManager.LoadScene(Config.EnvironmentScene, LoadSceneMode.Additive);
+
+        string addictionalLogicScene = Mode switch
         {
-            if (!IsSceneLoaded(Config.EnvironmentScene))
-                SceneManager.LoadScene(Config.EnvironmentScene, LoadSceneMode.Additive);
-        }
+            ApplicationMode.Server => (string)serverLogicScene,
+            ApplicationMode.Client => (string)clientLogicScene,
+            _ => String.Empty,
+        };
 
-        switch (Mode)
-        {
-            case ApplicationMode.Server:
-                if (!IsSceneLoaded(serverLogicScene))
-                    SceneManager.LoadScene(serverLogicScene, LoadSceneMode.Additive);
-
-                if (networkManager != null)
-                    networkManager.StartServer();
-
-                break;
-            case ApplicationMode.Client:
-                if (!IsSceneLoaded(clientLogicScene))
-                    SceneManager.LoadScene(clientLogicScene, LoadSceneMode.Additive);
-
-                if (networkManager != null)
-                    networkManager.StartClient();
-
-                break;
-        }
+        if (!IsSceneLoaded(addictionalLogicScene))
+            SceneManager.LoadScene(addictionalLogicScene, LoadSceneMode.Additive);
     }
 
     private void OnDisable()
     {
+        if (Instance == this)
+            Instance = null;
+
         if (networkManager != null)
             networkManager.Shutdown();
+    }
+    #endregion
+
+    #region Public Methods
+    public static NetworkManager GetNetworkManager()
+    {
+        return Instance == null ? null : Instance.networkManager;
     }
     #endregion
 
@@ -105,11 +106,14 @@ public class ApplicationLogic : MonoBehaviour
 
     bool IsSceneLoaded(string scenePath)
     {
+        if (string.IsNullOrEmpty(scenePath))
+            return false;
+
         for (int i = 0; i < SceneManager.sceneCount; i++)
         {
             Scene scene = SceneManager.GetSceneAt(i);
 
-            if (scene.path == scenePath)
+            if (scene.path == scenePath || scene.path.Contains(scenePath))
             {
                 return scene.isLoaded;
             }

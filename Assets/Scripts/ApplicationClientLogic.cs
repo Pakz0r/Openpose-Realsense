@@ -1,18 +1,92 @@
 using System.Collections;
-using System.Collections.Generic;
+using Unity.Netcode.Transports.UTP;
+using Unity.Netcode;
 using UnityEngine;
 
 public class ApplicationClientLogic : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    #region Serialized Fields
+    [SerializeField]
+    private int connectRetryDelay = 5;
+    #endregion
+
+    #region Private Fields
+    private NetworkManager networkManager;
+    private UnityTransport networkTransport;
+    private Coroutine connectCoroutine;
+    #endregion
+
+    #region Unity Lifecycle
+    void OnEnable()
     {
-        
+        networkManager = ApplicationLogic.GetNetworkManager();
+
+        if (networkManager == null)
+            return;
+
+        networkTransport = networkManager.gameObject.GetComponent<UnityTransport>();
+
+        networkManager.OnClientConnectedCallback += OnClientConnect;
+        networkManager.OnClientDisconnectCallback += OnClientDisconnect;
+
+
+        StartClientConnection();
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnDisable()
     {
-        
+        if (networkManager == null)
+            return;
+
+        networkManager.OnClientConnectedCallback -= OnClientConnect;
+        networkManager.OnClientDisconnectCallback -= OnClientDisconnect;
     }
+    #endregion
+
+    #region Private Methods
+    private void OnClientDisconnect(ulong clientId)
+    {
+        // check if network connection failed
+        if (clientId == 0)
+            return;
+
+        Debug.Log($"[Network] Client {clientId} Disconnected");
+        StartClientConnection();
+    }
+
+    private void OnClientConnect(ulong clientId)
+    {
+        Debug.Log($"[Network] Client Connected with ID {clientId}");
+    }
+
+    private void StartClientConnection()
+    {
+        if (connectCoroutine != null)
+            StopCoroutine(connectCoroutine);
+
+        connectCoroutine = StartCoroutine(StartClientConnectInternal());
+    }
+
+    private IEnumerator StartClientConnectInternal()
+    {
+        if (networkManager == null)
+            yield break;
+
+        while (true)
+        {
+            Debug.Log("[Network] Trying to connect to server...");
+
+            networkManager.StartClient();
+            yield return new WaitForSeconds(0.2f + networkTransport.ConnectTimeoutMS / 1000);
+
+            if (networkManager.IsConnectedClient)
+                break;
+
+            Debug.Log($"[Network] Retry connect in {connectRetryDelay} seconds...");
+            yield return new WaitForSeconds(connectRetryDelay);
+        }
+
+        connectCoroutine = null;
+    }
+    #endregion
 }

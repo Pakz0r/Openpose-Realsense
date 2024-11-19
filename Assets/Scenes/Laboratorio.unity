@@ -96,7 +96,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000002, guid: 02027834541bcbe4fb0868b8e88b5b5a, type: 2}
+  m_LightingDataAsset: {fileID: 112000000, guid: 02027834541bcbe4fb0868b8e88b5b5a, type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: 2ca30bca466dcfd4dbd6885612a1c5f7, type: 2}
 --- !u!196 &4
 NavMeshSettings:
@@ -2343,7 +2343,7 @@ GameObject:
   - component: {fileID: 683747886}
   - component: {fileID: 683747885}
   m_Layer: 0
-  m_Name: Reflection Probe (1)
+  m_Name: Hallway_ReflectionProbe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3342,7 +3342,7 @@ GameObject:
   - component: {fileID: 835293653}
   - component: {fileID: 835293652}
   m_Layer: 0
-  m_Name: Reflection Probe
+  m_Name: Lab_ReflectionProbe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
