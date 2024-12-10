@@ -27,12 +27,12 @@ public class ApplicationServerLogic : MonoBehaviour
             return;
 
         networkManager.StartServer();
-        SensorWatcher.OnPersonUpdate.AddListener(DrawPerson);
+        SensorWatcher.PersonUpdated.AddListener(DrawPerson);
     }
 
     private void OnDisable()
     {
-        SensorWatcher.OnPersonUpdate.RemoveAllListeners();
+        SensorWatcher.PersonUpdated.RemoveAllListeners();
     }
     #endregion
 
@@ -86,6 +86,10 @@ public class ApplicationServerLogic : MonoBehaviour
 
         var personObject = CreatePerson(personID);
         peoples[personName] = personObject;
+
+        var label = personObject.GetComponentInChildren<PlayerNameBillboard>();
+        if (label != null) label.SetPlayerName(personName);
+
         return personObject;
     }
 
@@ -158,6 +162,10 @@ public class ApplicationServerLogic : MonoBehaviour
                 {
                     constraint.weight = EvalWeight(constraint.weight, boneData.confidence);
                     constraint.data.sourceObject.localPosition = new Vector3(boneData.x, boneData.y, boneData.z) - rigPosition;
+
+                    if (boneObject.TryGetComponent<NetworkBoneSynchronization>(out var networkBone))
+                        networkBone.SetWeightPosition(constraint.weight);
+
                     break;
                 }
             }
@@ -175,6 +183,7 @@ public class ApplicationServerLogic : MonoBehaviour
 
             // check for bone to look at
             var boneTargetId = boneId.GetLookAtBoneFrom();
+
             if (boneTargetId == OpenPoseBone.Invalid)
                 continue;
 
@@ -187,11 +196,11 @@ public class ApplicationServerLogic : MonoBehaviour
             // query rig childs transforms
             for (var targetId = 0; targetId < personRig.transform.childCount; targetId++)
             {
-                var boneTargetObject = personRig.transform.GetChild(targetId);
+                var targetBone = personRig.transform.GetChild(targetId);
 
-                if (boneTargetObject.name == boneTargetName)
+                if (targetBone.name == boneTargetName)
                 {
-                    constraint.data.sourceObject.LookAt(boneTargetObject);
+                    constraint.data.sourceObject.LookAt(targetBone);
 
                     switch (boneId)
                     {
@@ -199,6 +208,7 @@ public class ApplicationServerLogic : MonoBehaviour
                             // upper left side is specular on Y asix
                             constraint.data.sourceObject.Rotate(Vector3.up, 180f);
                             break;
+
                         case OpenPoseBone.LeftLowerArm:
                             // upper left side is specular on Y asix
                             constraint.data.sourceObject.Rotate(Vector3.up, 180f);
@@ -210,6 +220,20 @@ public class ApplicationServerLogic : MonoBehaviour
                             constraint.data.sourceObject.Rotate(Vector3.right, 180f);
                             break;
                     }
+
+                    // update bone rotation constraint weight based on target weight
+                    if (targetBone.TryGetComponent<OverrideTransform>(out var targetConstraint))
+                    {
+                        constraint.data.rotationWeight = targetConstraint.weight;
+                    }
+                    else // reset bone rotation constraint weight
+                    {
+                        constraint.data.rotationWeight = 1.0f;
+                    }
+
+                    // update network bone rotation weight
+                    if (boneObject.TryGetComponent<NetworkBoneSynchronization>(out var networkBone))
+                        networkBone.SetWeightRotation(constraint.data.rotationWeight);
 
                     break;
                 }
@@ -223,9 +247,11 @@ public class ApplicationServerLogic : MonoBehaviour
         //Un approccio elegante per aggiornare il peso potrebbe essere quello di usare un metodo Bayesiano.
         //Considera il peso al tempo (t-1) come un prior(una stima iniziale) e aggiorna il peso in base alla nuova confidence.
         //Questo approccio aggiorna il peso combinando l'informazione precedente (prior) e quella nuova (likelihood) in maniera ottimale.
-        //Se la confidence corrente è alta, il peso si aggiorna verso l'alto; se è bassa, il peso si riduce.
-        //Al passo t0 (sul prefab) il peso è 0.5.
-        return (currentWeight * confidence) / (currentWeight * confidence + (1 - currentWeight) * (1 - confidence));
+        //Se la confidence corrente ï¿½ alta, il peso si aggiorna verso l'alto; se ï¿½ bassa, il peso si riduce.
+        //Al passo t0 (sul prefab) il peso ï¿½ 0.5.
+        //return (currentWeight * confidence) / (currentWeight * confidence + (1 - currentWeight) * (1 - confidence));
+
+        return confidence;
     }
     #endregion
 }

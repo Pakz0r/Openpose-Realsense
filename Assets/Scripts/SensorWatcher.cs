@@ -14,8 +14,8 @@ public class SensorWatcher : MonoBehaviour
     #endregion
 
     #region Public Events
-    public static UnityEvent<SensorWatcher, FrameSkeletonsPoints3D> OnNewFrame = new UnityEvent<SensorWatcher, FrameSkeletonsPoints3D>();
-    public static UnityEvent<SensorWatcher, PeopleData> OnPersonUpdate = new UnityEvent<SensorWatcher, PeopleData>();
+    public static UnityEvent<SensorWatcher, FrameSkeletonsPoints3D> FrameReaded = new();
+    public static UnityEvent<SensorWatcher, PeopleData> PersonUpdated = new();
     #endregion
 
     #region Private Fields
@@ -84,11 +84,14 @@ public class SensorWatcher : MonoBehaviour
     private async void ReadFrameFromFile(string framePath)
     {
         currentFrame = await framePath.ParseFromFileAsync<FrameSkeletonsPoints3D>();
-        OnNewFrame?.Invoke(this, currentFrame);
+
+        Debug.Log($"Frame {currentFrame.ID_Frame} readed for '{currentFrame.thingId}'");
+
+        FrameReaded?.Invoke(this, currentFrame);
 
         foreach (var person in currentFrame.People)
         {
-            OnPersonUpdate?.Invoke(this, person);
+            PersonUpdated?.Invoke(this, person);
         }
     }
     #endregion
