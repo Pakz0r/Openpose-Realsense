@@ -36,6 +36,7 @@ public class PlayerNameBillboard : NetworkBehaviour
     {
         originalRotation = transform.rotation.eulerAngles;
 
+        // update player label name on spawn
         if (this.playerLabel != null)
         {
             this.playerLabel.text = playerName.Value.ToString();
@@ -101,7 +102,7 @@ public class PlayerNameBillboard : NetworkBehaviour
 
         if (this.playerLabel != null)
         {
-            this.playerLabel.text = current.ConvertToString();
+            this.playerLabel.text = current.ToString();
         }
     }
     #endregion
