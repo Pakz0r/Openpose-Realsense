@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Utilities.Parser;
 using OpenPose;
+using System.Linq;
 
 public class SensorsManager : MonoBehaviour
 {
@@ -11,6 +12,13 @@ public class SensorsManager : MonoBehaviour
     [Serializable]
     public class RootObject
     {
+        public RoomSensors[] Rooms;
+    }
+
+    [Serializable]
+    public class RoomSensors
+    {
+        public string ID;
         public Sensor[] Sensors;
     }
 
@@ -42,7 +50,10 @@ public class SensorsManager : MonoBehaviour
 
         var root = await JSON.ParseFromFileAsync<RootObject>(filePath);
 
-        foreach (var sensor in root.Sensors)
+        var currentRoom = ApplicationLogic.Config.EnvironmentScene;
+        var room = root.Rooms.FirstOrDefault(x => x.ID.Equals(currentRoom));
+
+        foreach (var sensor in room.Sensors)
         {
             try
             {

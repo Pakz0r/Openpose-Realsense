@@ -51,12 +51,6 @@ public class ApplicationLogic : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
         SceneManager.sceneLoaded += OnSceneLoaded;
 
-#if UNITY_EDITOR
-        // setup sensor manager listner
-        SensorsManager.SensorCreated.RemoveListener(CreateSimulationOnSensorCreated);
-        SensorsManager.SensorCreated.AddListener(CreateSimulationOnSensorCreated);
-#endif
-
         // config parse
         string filePath = Path.Combine(Application.dataPath, "../config.json");
 
@@ -85,6 +79,12 @@ public class ApplicationLogic : MonoBehaviour
 
         if (!IsSceneLoaded(addictionalLogicScene))
             SceneManager.LoadScene(addictionalLogicScene, LoadSceneMode.Additive);
+
+#if UNITY_EDITOR
+        // setup sensor manager listner
+        SensorsManager.SensorCreated.RemoveListener(CreateSimulationOnSensorCreated);
+        SensorsManager.SensorCreated.AddListener(CreateSimulationOnSensorCreated);
+#endif
     }
 
     private void OnDisable()
@@ -121,7 +121,7 @@ public class ApplicationLogic : MonoBehaviour
         for (int i = 0; i < 34; i++)
         {
             await Task.Delay(2000);
-            var streamingAssetFile = Path.Combine(Application.streamingAssetsPath, $"frame{i}_skeletonsPoints3D.json");
+            var streamingAssetFile = Path.Combine(Application.streamingAssetsPath, Config.EnvironmentScene, $"frame{i}_skeletonsPoints3D.json");
             var sensorFolderFile = Path.Combine(sensor.Folder, $"frame{i}_skeletonsPoints3D.json");
             File.Copy(streamingAssetFile, sensorFolderFile);
         }
