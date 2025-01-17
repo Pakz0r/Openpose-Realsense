@@ -226,7 +226,7 @@ MonoBehaviour:
   PlayerIndex: -1
   AutoEnableInputs: 1
   XYAxis: {fileID: -5630151704836100654, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  ZAxis: {fileID: 0}
+  ZAxis: {fileID: -2628348278088678560, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
 --- !u!1 &418548884
 GameObject:
   m_ObjectHideFlags: 0

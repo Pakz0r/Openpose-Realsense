@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  file-provider:
+    image: file-provider-image # Sostituisci con l'immagine del secondo container
+    container_name: file-provider
+    volumes:
+      - shared-data:/shared
+
+  unity-ai-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: unity-ai-server
+    volumes:
+      - shared-data:/shared
+    ports:
+      - "7777:7777/udp"
+      - "27015:27015/tcp"
+
+volumes:
+  shared-data:
+    driver: local

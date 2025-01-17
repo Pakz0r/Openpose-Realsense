@@ -24,11 +24,23 @@ public class ApplicationClientLogic : MonoBehaviour
         if (networkManager == null)
             return;
 
-        networkTransport = networkManager.gameObject.GetComponent<UnityTransport>();
+        if (networkManager.gameObject.TryGetComponent(out networkTransport))
+        {
+            var config = ApplicationLogic.Config;
 
-        networkManager.OnClientConnectedCallback += OnClientConnect;
-        networkManager.OnClientDisconnectCallback += OnClientDisconnect;
+            if (config.ServerPort > 0)
+            {
+                networkTransport.ConnectionData.Port = config.ServerPort;
+            }
 
+            if (!string.IsNullOrEmpty(config.ServerAddress))
+            {
+                networkTransport.ConnectionData.Address = config.ServerAddress;
+            }
+
+            networkManager.OnClientConnectedCallback += OnClientConnect;
+            networkManager.OnClientDisconnectCallback += OnClientDisconnect;
+        }
 
         StartClientConnection();
     }

@@ -5,6 +5,7 @@ using UnityEngine.Animations.Rigging;
 using UnityEngine;
 using OpenPose;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 
 public class ApplicationServerLogic : MonoBehaviour
 {
@@ -25,6 +26,16 @@ public class ApplicationServerLogic : MonoBehaviour
 
         if (networkManager == null)
             return;
+
+        if (networkManager.gameObject.TryGetComponent<UnityTransport>(out var networkTransport))
+        {
+            var config = ApplicationLogic.Config;
+
+            if (config.ServerPort > 0)
+            {
+                networkTransport.ConnectionData.Port = config.ServerPort;
+            }
+        }
 
         networkManager.StartServer();
         SensorWatcher.PersonUpdated.AddListener(DrawPerson);

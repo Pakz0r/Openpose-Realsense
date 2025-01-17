@@ -23,6 +23,9 @@ public class ApplicationLogic : MonoBehaviour
         public string Mode;
         public float MinConfidence;
         public string EnvironmentScene;
+        public bool DisableEnvironmentScene;
+        public string ServerAddress;
+        public ushort ServerPort;
     }
     #endregion
 
@@ -67,7 +70,10 @@ public class ApplicationLogic : MonoBehaviour
             Mode = applicationMode;
         }
 
-        if (!string.IsNullOrEmpty(Config.EnvironmentScene) && !IsSceneLoaded(Config.EnvironmentScene))
+        if (Config.ServerPort == 0)
+            Config.ServerPort = 7777; // Default server port
+
+        if (!Config.DisableEnvironmentScene && !string.IsNullOrEmpty(Config.EnvironmentScene) && !IsSceneLoaded(Config.EnvironmentScene))
             SceneManager.LoadScene(Config.EnvironmentScene, LoadSceneMode.Additive);
 
         string addictionalLogicScene = Mode switch
