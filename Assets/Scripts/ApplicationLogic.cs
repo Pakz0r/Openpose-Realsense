@@ -2,10 +2,11 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.XR.Management;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 using Utilities.Parser;
 using Tymski;
-using Unity.Netcode;
 using static SensorsManager;
 
 public class ApplicationLogic : MonoBehaviour
@@ -30,10 +31,19 @@ public class ApplicationLogic : MonoBehaviour
     #endregion
 
     #region Serialize Fields
+    [Header("Logic Scene Setup")]
     [SerializeField]
     private SceneReference serverLogicScene;
     [SerializeField]
     private SceneReference clientLogicScene;
+
+    [Header("Client Camera Rig Scene Setup")]
+    [SerializeField]
+    private SceneReference desktopCameraScene;
+    [SerializeField]
+    private SceneReference vrCameraScene;
+
+    [Header("Networking")]
     [SerializeField]
     private NetworkManager networkManager;
     #endregion
@@ -76,6 +86,7 @@ public class ApplicationLogic : MonoBehaviour
         if (!Config.DisableEnvironmentScene && !string.IsNullOrEmpty(Config.EnvironmentScene) && !IsSceneLoaded(Config.EnvironmentScene))
             SceneManager.LoadScene(Config.EnvironmentScene, LoadSceneMode.Additive);
 
+        // scene logic load
         string addictionalLogicScene = Mode switch
         {
             ApplicationMode.Server => (string)serverLogicScene,
@@ -85,6 +96,32 @@ public class ApplicationLogic : MonoBehaviour
 
         if (!IsSceneLoaded(addictionalLogicScene))
             SceneManager.LoadScene(addictionalLogicScene, LoadSceneMode.Additive);
+
+        // client camera rig scene load
+        if (Mode == ApplicationMode.Client)
+        {
+            string cameraLogicScene;
+
+#if UNITY_ANDROID
+            if (
+                !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("XR_SELECTED_RUNTIME_JSON")) // Verifica presenza del simulatore meta XR
+                || SystemInfo.deviceModel.Contains("Oculus") // Verifica il modello del dispositivo
+                )
+            {
+                Debug.Log("Meta Quest rilevato. Inizializzazione XR...");
+                cameraLogicScene = vrCameraScene;
+                InitializeXR();
+            }
+            else
+#endif
+            {
+                Debug.Log("Dispositivo non compatibile con XR. Avvio in modalità normale.");
+                cameraLogicScene = desktopCameraScene;
+            }
+
+            if (!IsSceneLoaded(cameraLogicScene))
+                SceneManager.LoadScene(cameraLogicScene, LoadSceneMode.Additive);
+        }
 
 #if UNITY_EDITOR
         // setup sensor manager listner
@@ -100,6 +137,8 @@ public class ApplicationLogic : MonoBehaviour
 
         if (networkManager != null)
             networkManager.Shutdown();
+
+        DeinitializeXR();
     }
     #endregion
 
@@ -142,7 +181,7 @@ public class ApplicationLogic : MonoBehaviour
         }
     }
 
-    bool IsSceneLoaded(string scenePath)
+    private bool IsSceneLoaded(string scenePath)
     {
         if (string.IsNullOrEmpty(scenePath))
             return false;
@@ -159,5 +198,35 @@ public class ApplicationLogic : MonoBehaviour
 
         return false;
     }
-#endregion
+
+    private void InitializeXR()
+    {
+        var xrManager = XRGeneralSettings.Instance.Manager;
+
+        if (xrManager != null)
+        {
+            xrManager.InitializeLoaderSync();
+
+            if (xrManager.activeLoader == null)
+            {
+                Debug.LogError("Errore durante l'inizializzazione di XR.");
+                return;
+            }
+
+            xrManager.StartSubsystems();
+            Debug.Log("XR inizializzato con successo.");
+        }
+    }
+
+    private void DeinitializeXR()
+    {
+        var xrManager = XRGeneralSettings.Instance.Manager;
+
+        if (xrManager != null && xrManager.activeLoader != null)
+        {
+            xrManager.StopSubsystems();
+            xrManager.DeinitializeLoader();
+        }
+    }
+    #endregion
 }

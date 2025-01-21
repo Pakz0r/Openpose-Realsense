@@ -168,10 +168,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serverLogicScene:
     sceneAsset: {fileID: 102900000, guid: a142d6fa22af0b84e89015d7c6a1d68f, type: 3}
-    scenePath: Assets/Scenes/ServerScene.unity
+    scenePath: Assets/Scenes/Logic/ServerLogicScene.unity
   clientLogicScene:
     sceneAsset: {fileID: 102900000, guid: a8ccc02272cfc434f9d845df51f3d337, type: 3}
-    scenePath: Assets/Scenes/ClientScene.unity
+    scenePath: Assets/Scenes/Logic/ClientLogicScene.unity
+  desktopCameraScene:
+    sceneAsset: {fileID: 102900000, guid: defd6992d2dab8d4cbb45c05dcb887c4, type: 3}
+    scenePath: Assets/Scenes/Camera/DesktopCameraScene.unity
+  vrCameraScene:
+    sceneAsset: {fileID: 102900000, guid: 0d19a0d40b70ce846b6b78d44681fc70, type: 3}
+    scenePath: Assets/Scenes/Camera/OculusCameraScene.unity
   networkManager: {fileID: 1351599603}
 --- !u!1 &1351599601
 GameObject:
