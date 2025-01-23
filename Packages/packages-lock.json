@@ -1,128 +1,5 @@
 {
   "dependencies": {
-    "com.autodesk.fbx": {
-      "version": "4.2.1",
-      "depth": 2,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.meta.xr.mrutilitykit": {
-      "version": "71.0.0",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.meta.xr.sdk.core": "71.0.0",
-        "com.unity.textmeshpro": "3.0.6",
-        "com.unity.ai.navigation": "1.1.4",
-        "com.unity.nuget.newtonsoft-json": "3.0.2"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.meta.xr.sdk.all": {
-      "version": "71.0.0",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.meta.xr.sdk.core": "71.0.0",
-        "com.meta.xr.sdk.audio": "71.0.0",
-        "com.meta.xr.sdk.voice": "71.0.0",
-        "com.meta.xr.simulator": "71.0.0",
-        "com.meta.xr.sdk.haptics": "71.0.0",
-        "com.meta.xr.mrutilitykit": "71.0.0",
-        "com.meta.xr.sdk.platform": "71.0.0",
-        "com.meta.xr.sdk.interaction": "71.0.0",
-        "com.meta.xr.sdk.interaction.ovr": "71.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.meta.xr.sdk.audio": {
-      "version": "71.0.0",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.meta.xr.sdk.core": {
-      "version": "71.0.0",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.meta.xr.sdk.haptics": {
-      "version": "71.0.0",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.meta.xr.sdk.core": "71.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.meta.xr.sdk.interaction": {
-      "version": "71.0.0",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.ugui": "1.0.0",
-        "com.unity.textmeshpro": "3.0.6"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.meta.xr.sdk.interaction.ovr": {
-      "version": "71.0.0",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.meta.xr.sdk.core": "71.0.0",
-        "com.meta.xr.sdk.interaction": "71.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.meta.xr.sdk.platform": {
-      "version": "71.0.0",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.ugui": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.meta.xr.sdk.voice": {
-      "version": "71.0.0",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.meta.xr.simulator": {
-      "version": "71.0.0",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.editorcoroutines": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.adaptiveperformance": {
-      "version": "4.0.1",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.profiling.core": "1.0.2",
-        "com.unity.subsystemregistration": "1.1.0"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.ai.navigation": {
-      "version": "1.1.5",
-      "depth": 2,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.modules.ai": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
     "com.unity.animation.rigging": {
       "version": "1.2.1",
       "depth": 0,
@@ -143,15 +20,6 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.unity.cinemachine": {
-      "version": "2.10.2",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.test-framework": "1.1.31"
-      },
-      "url": "https://packages.unity.com"
-    },
     "com.unity.collections": {
       "version": "1.2.4",
       "depth": 2,
@@ -164,7 +32,7 @@
     },
     "com.unity.editorcoroutines": {
       "version": "1.0.0",
-      "depth": 1,
+      "depth": 2,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -174,46 +42,6 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.feature.mobile": {
-      "version": "1.0.0",
-      "depth": 0,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.mobile.android-logcat": "1.4.2",
-        "com.unity.adaptiveperformance": "4.0.1",
-        "com.unity.mobile.notifications": "2.3.2"
-      }
-    },
-    "com.unity.feature.worldbuilding": {
-      "version": "1.0.1",
-      "depth": 0,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.probuilder": "5.2.2",
-        "com.unity.polybrush": "1.1.6",
-        "com.unity.formats.fbx": "4.2.1",
-        "com.unity.terrain-tools": "5.0.1"
-      }
-    },
-    "com.unity.formats.fbx": {
-      "version": "4.2.1",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.autodesk.fbx": "4.2.1",
-        "com.unity.timeline": "1.7.1"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.ide.rider": {
-      "version": "3.0.28",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.ext.nunit": "1.0.6"
-      },
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
@@ -248,31 +76,6 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
-    "com.unity.memoryprofiler": {
-      "version": "1.1.0",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.editorcoroutines": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.mobile.android-logcat": {
-      "version": "1.4.2",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.mobile.notifications": {
-      "version": "2.3.2",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.modules.androidjni": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
     "com.unity.netcode.gameobjects": {
       "version": "1.9.1",
       "depth": 0,
@@ -286,40 +89,6 @@
     "com.unity.nuget.mono-cecil": {
       "version": "1.11.4",
       "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.nuget.newtonsoft-json": {
-      "version": "3.2.1",
-      "depth": 2,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.polybrush": {
-      "version": "1.1.6",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.settings-manager": "2.0.1"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.probuilder": {
-      "version": "5.2.2",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.modules.imgui": "1.0.0",
-        "com.unity.modules.physics": "1.0.0",
-        "com.unity.settings-manager": "1.0.3"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.profiling.core": {
-      "version": "1.0.2",
-      "depth": 2,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -398,15 +167,6 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.unity.subsystemregistration": {
-      "version": "1.1.1",
-      "depth": 2,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.modules.subsystems": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
     "com.unity.sysroot": {
       "version": "2.0.10",
       "depth": 1,
@@ -423,16 +183,6 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.unity.terrain-tools": {
-      "version": "5.0.1",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.modules.terrain": "1.0.0",
-        "com.unity.modules.terrainphysics": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
     "com.unity.test-framework": {
       "version": "1.1.33",
       "depth": 0,
@@ -445,7 +195,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.textmeshpro": {
-      "version": "3.0.6",
+      "version": "3.0.9",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -515,7 +265,7 @@
     },
     "com.unity.xr.core-utils": {
       "version": "2.3.0",
-      "depth": 2,
+      "depth": 1,
       "source": "registry",
       "dependencies": {
         "com.unity.modules.xr": "1.0.0"
@@ -545,18 +295,18 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.meta-openxr": {
-      "version": "1.0.1",
+      "version": "1.0.2",
       "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.xr.openxr": "1.7.0",
-        "com.unity.xr.arfoundation": "5.1.0-pre.6"
+        "com.unity.xr.arfoundation": "5.1.0"
       },
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.openxr": {
       "version": "1.11.0",
-      "depth": 1,
+      "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.inputsystem": "1.6.3",
