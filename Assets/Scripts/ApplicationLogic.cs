@@ -7,6 +7,8 @@ using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using Utilities.Parser;
 using Tymski;
+using Cysharp.Threading.Tasks;
+
 using static SensorsManager;
 
 public class ApplicationLogic : MonoBehaviour
@@ -27,6 +29,15 @@ public class ApplicationLogic : MonoBehaviour
         public bool DisableEnvironmentScene;
         public string ServerAddress;
         public ushort ServerPort;
+    }
+
+    private enum SupportedHeadset
+    {
+        None,
+        Quest1,
+        Quest2,
+        QuestPro,
+        Quest3
     }
     #endregion
 
@@ -52,6 +63,9 @@ public class ApplicationLogic : MonoBehaviour
     public static ApplicationMode Mode { get; private set; }
     public static ApplicationConfig Config { get; private set; }
     public static ApplicationLogic Instance { get; private set; }
+    #endregion
+
+    #region Private Fields
     #endregion
 
     #region Unity Lifecycle
@@ -100,23 +114,17 @@ public class ApplicationLogic : MonoBehaviour
         // client camera rig scene load
         if (Mode == ApplicationMode.Client)
         {
-            string cameraLogicScene;
+            string cameraLogicScene = desktopCameraScene;
 
-#if UNITY_ANDROID
-            if (
-                !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("XR_SELECTED_RUNTIME_JSON")) // Verifica presenza del simulatore meta XR
-                || SystemInfo.deviceModel.Contains("Oculus") // Verifica il modello del dispositivo
-                )
+            if (IsRunningOnHMD(out _))
             {
-                Debug.Log("Meta Quest rilevato. Inizializzazione XR...");
+                Debug.Log("Dispositivo HMD rilevato. Avvio in modalità VR.");
                 cameraLogicScene = vrCameraScene;
-                InitializeXR();
             }
             else
-#endif
             {
-                Debug.Log("Dispositivo non compatibile con XR. Avvio in modalità normale.");
-                cameraLogicScene = desktopCameraScene;
+                Debug.Log("Nessun dispositivo HMD rilevato. Avvio in modalità desktop.");
+                DeinitializeXR().Forget();
             }
 
             if (!IsSceneLoaded(cameraLogicScene))
@@ -137,8 +145,6 @@ public class ApplicationLogic : MonoBehaviour
 
         if (networkManager != null)
             networkManager.Shutdown();
-
-        DeinitializeXR();
     }
     #endregion
 
@@ -166,7 +172,7 @@ public class ApplicationLogic : MonoBehaviour
         {
             Directory.CreateDirectory(sensor.Folder);
         }
-        
+
         for (int i = 0; i < 34; i++)
         {
             await Task.Delay(2000);
@@ -203,34 +209,36 @@ public class ApplicationLogic : MonoBehaviour
         return false;
     }
 
-    private void InitializeXR()
-    {
-        var xrManager = XRGeneralSettings.Instance.Manager;
-
-        if (xrManager != null)
-        {
-            xrManager.InitializeLoaderSync();
-
-            if (xrManager.activeLoader == null)
-            {
-                Debug.LogError("Errore durante l'inizializzazione di XR.");
-                return;
-            }
-
-            xrManager.StartSubsystems();
-            Debug.Log("XR inizializzato con successo.");
-        }
-    }
-
-    private void DeinitializeXR()
+    private async UniTask DeinitializeXR()
     {
         var xrManager = XRGeneralSettings.Instance.Manager;
 
         if (xrManager != null && xrManager.activeLoader != null)
         {
+            await UniTask.WaitUntil(() => xrManager.isInitializationComplete);
             xrManager.StopSubsystems();
             xrManager.DeinitializeLoader();
         }
+    }
+
+    private static bool IsRunningOnHMD(out SupportedHeadset headset)
+    {
+#if UNITY_ANDROID
+        using var build = new AndroidJavaClass("android.os.Build");
+        string device = build.GetStatic<string>("DEVICE");
+
+        headset = device switch
+        {
+            "miramar" => SupportedHeadset.Quest1,
+            "hollywood" => SupportedHeadset.Quest2,
+            "seacliff" => SupportedHeadset.QuestPro,
+            "eureka" => SupportedHeadset.Quest3,
+            _ => SupportedHeadset.None
+        };
+#else
+        headset = SupportedHeadset.None;
+#endif
+        return headset != SupportedHeadset.None;
     }
     #endregion
 }
