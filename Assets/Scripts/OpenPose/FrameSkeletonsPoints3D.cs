@@ -14,6 +14,7 @@ namespace OpenPose
     public class PeopleData
     {
         public int personID;
+        public bool has_fallen;
         public FaceRotation face_rotation;
         public BoneData[] skeleton;
     }

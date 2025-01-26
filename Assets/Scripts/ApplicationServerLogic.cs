@@ -6,6 +6,9 @@ using UnityEngine;
 using OpenPose;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+using UniRx.Triggers;
+using UniRx;
+using Cysharp.Threading.Tasks;
 
 public class ApplicationServerLogic : MonoBehaviour
 {
@@ -86,6 +89,12 @@ public class ApplicationServerLogic : MonoBehaviour
 
         UpdateRigPositionConstraints(personRig, personData.skeleton, personObject.transform.localPosition);
         UpdateRigRotationConstraints(personRig);
+
+        if (personObject.TryGetComponent<Animator>(out var animator))
+        {
+            // update the animator parameter "Fall"
+            animator.SetBool("Fall", personData.has_fallen);
+        }
     }
 
     private GameObject CreatePersonIfNotExists(int personID)
@@ -171,11 +180,11 @@ public class ApplicationServerLogic : MonoBehaviour
 
                 if (boneObject.name == boneName)
                 {
-                    constraint.weight = EvalWeight(constraint.weight, boneData.confidence);
+                    constraint.weight = boneData.confidence;
                     constraint.data.sourceObject.localPosition = new Vector3(boneData.x, boneData.y, boneData.z) - rigPosition;
 
                     if (boneObject.TryGetComponent<NetworkBoneSynchronization>(out var networkBone))
-                        networkBone.SetWeightPosition(constraint.weight);
+                        networkBone.SetWeightPosition(boneData.confidence);
 
                     break;
                 }
@@ -250,19 +259,6 @@ public class ApplicationServerLogic : MonoBehaviour
                 }
             }
         }
-    }
-
-    // Approccio Bayesiano (aggiornamento con prior)
-    private static float EvalWeight(float currentWeight, float confidence)
-    {
-        //Un approccio elegante per aggiornare il peso potrebbe essere quello di usare un metodo Bayesiano.
-        //Considera il peso al tempo (t-1) come un prior(una stima iniziale) e aggiorna il peso in base alla nuova confidence.
-        //Questo approccio aggiorna il peso combinando l'informazione precedente (prior) e quella nuova (likelihood) in maniera ottimale.
-        //Se la confidence corrente � alta, il peso si aggiorna verso l'alto; se � bassa, il peso si riduce.
-        //Al passo t0 (sul prefab) il peso � 0.5.
-        //return (currentWeight * confidence) / (currentWeight * confidence + (1 - currentWeight) * (1 - confidence));
-
-        return confidence;
     }
     #endregion
 }

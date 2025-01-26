@@ -3,7 +3,6 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 using Utilities.Parser;
-using OpenPose;
 using System.Linq;
 
 public class SensorsManager : MonoBehaviour
@@ -71,6 +70,9 @@ public class SensorsManager : MonoBehaviour
                 // apply sensor offset
                 var sensorOffset = new GameObject("Offset");
                 sensorOffset.transform.SetParent(sensorObject.transform);
+
+                sensor.Offset.y = 1f - sensor.Position.y; // the sum of Y position and offset must be 1.0
+
                 sensorOffset.transform.SetLocalPositionAndRotation(
                     new Vector3(sensor.Offset.x, sensor.Offset.y, sensor.Offset.z),
                     Quaternion.identity
