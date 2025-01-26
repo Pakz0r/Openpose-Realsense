@@ -162,7 +162,11 @@ public class ApplicationLogic : MonoBehaviour
                 file.Delete();
             }
         }
-
+        else
+        {
+            Directory.CreateDirectory(sensor.Folder);
+        }
+        
         for (int i = 0; i < 34; i++)
         {
             await Task.Delay(2000);

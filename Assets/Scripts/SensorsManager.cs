@@ -33,6 +33,7 @@ public class SensorsManager : MonoBehaviour
     #endregion
 
     #region Public Fields
+    public static UnityEvent<Sensor> SensorInitialized = new();
     public static UnityEvent<Sensor> SensorCreated = new();
     #endregion
 
@@ -78,12 +79,15 @@ public class SensorsManager : MonoBehaviour
                     Quaternion.identity
                 );
 
+                // invoke sensor created event
+                SensorCreated?.Invoke(sensor);
+
                 // setup camera watcher
                 var watcher = sensorOffset.AddComponent<SensorWatcher>();
                 watcher.SetupWatcher(sensor.Folder);
 
-                // invoke sensor created event
-                SensorCreated?.Invoke(sensor);
+                // invoke sensor initialized event
+                SensorInitialized?.Invoke(sensor);
             }
             catch (Exception e)
             {
