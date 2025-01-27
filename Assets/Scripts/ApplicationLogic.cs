@@ -79,7 +79,11 @@ public class ApplicationLogic : MonoBehaviour
         SceneManager.sceneLoaded += OnSceneLoaded;
 
         // config parse
+#if UNITY_ANDROID && !UNITY_EDITOR
+        string filePath = Path.Combine(Application.persistentDataPath, "config.json");
+#else
         string filePath = Path.Combine(Application.dataPath, "../config.json");
+#endif
 
         if (!File.Exists(filePath))
         {
@@ -146,7 +150,7 @@ public class ApplicationLogic : MonoBehaviour
         if (networkManager != null)
             networkManager.Shutdown();
     }
-    #endregion
+#endregion
 
     #region Public Methods
     public static NetworkManager GetNetworkManager()

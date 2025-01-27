@@ -18,6 +18,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Camera/DesktopCameraScene.unity
     guid: defd6992d2dab8d4cbb45c05dcb887c4
   - enabled: 1
+    path: Assets/Scenes/Camera/OculusCameraScene.unity
+    guid: 0d19a0d40b70ce846b6b78d44681fc70
+  - enabled: 1
     path: Assets/Scenes/Environments/Laboratorio.unity
     guid: d9bcced24382cfa4fadc520ef4a81d04
   - enabled: 1
