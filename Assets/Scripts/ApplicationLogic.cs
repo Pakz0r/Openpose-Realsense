@@ -19,7 +19,7 @@ public class ApplicationLogic : MonoBehaviour
         Client,
     }
 
-    private enum SupportedHeadset
+    public enum SupportedHeadset
     {
         None,
         Quest1,
@@ -53,6 +53,7 @@ public class ApplicationLogic : MonoBehaviour
 
     #region Public Fields
     public static ApplicationMode Mode { get; private set; }
+    public static SupportedHeadset CurrentHMD { get; private set; }
     public static ApplicationLogic Instance { get; private set; }
     #endregion
 
@@ -99,10 +100,11 @@ public class ApplicationLogic : MonoBehaviour
         {
             string cameraLogicScene = desktopCameraScene;
 
-            if (IsRunningOnHMD(out _))
+            if (IsRunningOnHMD(out var hmd))
             {
                 Debug.Log("Dispositivo HMD rilevato. Avvio in modalità VR.");
                 cameraLogicScene = vrCameraScene;
+                CurrentHMD = hmd;
             }
             else
             {
