@@ -26,16 +26,14 @@ public class ApplicationClientLogic : MonoBehaviour
 
         if (networkManager.gameObject.TryGetComponent(out networkTransport))
         {
-            var config = ApplicationLogic.Config;
-
-            if (config.ServerPort > 0)
+            if (ApplicationConfig.Instance.ServerPort > 0)
             {
-                networkTransport.ConnectionData.Port = config.ServerPort;
+                networkTransport.ConnectionData.Port = ApplicationConfig.Instance.ServerPort;
             }
 
-            if (!string.IsNullOrEmpty(config.ServerAddress))
+            if (!string.IsNullOrEmpty(ApplicationConfig.Instance.ServerAddress))
             {
-                networkTransport.ConnectionData.Address = config.ServerAddress;
+                networkTransport.ConnectionData.Address = ApplicationConfig.Instance.ServerAddress;
             }
 
             networkManager.OnClientConnectedCallback += OnClientConnect;

@@ -32,11 +32,9 @@ public class ApplicationServerLogic : MonoBehaviour
 
         if (networkManager.gameObject.TryGetComponent<UnityTransport>(out var networkTransport))
         {
-            var config = ApplicationLogic.Config;
-
-            if (config.ServerPort > 0)
+            if (ApplicationConfig.Instance.ServerPort > 0)
             {
-                networkTransport.ConnectionData.Port = config.ServerPort;
+                networkTransport.ConnectionData.Port = ApplicationConfig.Instance.ServerPort;
             }
         }
 
@@ -138,7 +136,7 @@ public class ApplicationServerLogic : MonoBehaviour
         var rigPosition = personTransform.localPosition;
 
         // update rigPosition only if confidence is over minimum
-        if (hipBoneData != null && hipBoneData.confidence > ApplicationLogic.Config.MinConfidence)
+        if (hipBoneData != null && hipBoneData.confidence > ApplicationConfig.Instance.MinConfidence)
         {
             rigPosition = new Vector3(hipBoneData.x, hipBoneData.y, hipBoneData.z);
         }
@@ -147,7 +145,7 @@ public class ApplicationServerLogic : MonoBehaviour
             // try eval rig position from head bone
             var headBoneData = skeleton.FirstOrDefault(bone => bone.pointID == (int)OpenPoseBone.Head);
 
-            if (headBoneData != null && headBoneData.confidence > ApplicationLogic.Config.MinConfidence)
+            if (headBoneData != null && headBoneData.confidence > ApplicationConfig.Instance.MinConfidence)
             {
                 rigPosition = new Vector3(headBoneData.x, 0.0f, headBoneData.z);
             }

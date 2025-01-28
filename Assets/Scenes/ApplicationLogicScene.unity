@@ -166,6 +166,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e4bf910ff1ffc8449a01c06d173adaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  config: {fileID: 11400000, guid: dbad0d1f51ce14b4baa1d48f26797f54, type: 2}
   serverLogicScene:
     sceneAsset: {fileID: 102900000, guid: a142d6fa22af0b84e89015d7c6a1d68f, type: 3}
     scenePath: Assets/Scenes/Logic/ServerLogicScene.unity
@@ -219,7 +220,7 @@ MonoBehaviour:
   ConnectionData:
     Address: 127.0.0.1
     Port: 7777
-    ServerListenAddress: 127.0.0.1
+    ServerListenAddress: 0.0.0.0
   DebugSimulator:
     PacketDelayMS: 0
     PacketJitterMS: 0

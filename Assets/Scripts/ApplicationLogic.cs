@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.XR.Management;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
-using Utilities.Parser;
 using Tymski;
 using Cysharp.Threading.Tasks;
 
@@ -20,17 +19,6 @@ public class ApplicationLogic : MonoBehaviour
         Client,
     }
 
-    [Serializable]
-    public class ApplicationConfig
-    {
-        public string Mode;
-        public float MinConfidence;
-        public string EnvironmentScene;
-        public bool DisableEnvironmentScene;
-        public string ServerAddress;
-        public ushort ServerPort;
-    }
-
     private enum SupportedHeadset
     {
         None,
@@ -41,7 +29,11 @@ public class ApplicationLogic : MonoBehaviour
     }
     #endregion
 
-    #region Serialize Fields
+    #region Serialize Fieldsù
+    [Header("Application Setup")]
+    [SerializeField]
+    private ApplicationConfig config;
+
     [Header("Logic Scene Setup")]
     [SerializeField]
     private SceneReference serverLogicScene;
@@ -61,11 +53,7 @@ public class ApplicationLogic : MonoBehaviour
 
     #region Public Fields
     public static ApplicationMode Mode { get; private set; }
-    public static ApplicationConfig Config { get; private set; }
     public static ApplicationLogic Instance { get; private set; }
-    #endregion
-
-    #region Private Fields
     #endregion
 
     #region Unity Lifecycle
@@ -85,24 +73,15 @@ public class ApplicationLogic : MonoBehaviour
         string filePath = Path.Combine(Application.dataPath, "../config.json");
 #endif
 
-        if (!File.Exists(filePath))
-        {
-            Debug.LogError($"Config not found at '{filePath}'");
-            return;
-        }
+        await config.ParseFromFile(filePath);
 
-        Config = await JSON.ParseFromFileAsync<ApplicationConfig>(filePath);
-
-        if (Enum.TryParse(Config.Mode, true, out ApplicationMode applicationMode))
+        if (Enum.TryParse(config.Mode, true, out ApplicationMode applicationMode))
         {
             Mode = applicationMode;
         }
 
-        if (Config.ServerPort == 0)
-            Config.ServerPort = 7777; // Default server port
-
-        if (!Config.DisableEnvironmentScene && !string.IsNullOrEmpty(Config.EnvironmentScene) && !IsSceneLoaded(Config.EnvironmentScene))
-            SceneManager.LoadScene(Config.EnvironmentScene, LoadSceneMode.Additive);
+        if (!config.DisableEnvironmentScene && !string.IsNullOrEmpty(config.EnvironmentScene) && !IsSceneLoaded(config.EnvironmentScene))
+            SceneManager.LoadScene(config.EnvironmentScene, LoadSceneMode.Additive);
 
         // scene logic load
         string addictionalLogicScene = Mode switch
@@ -150,7 +129,7 @@ public class ApplicationLogic : MonoBehaviour
         if (networkManager != null)
             networkManager.Shutdown();
     }
-#endregion
+    #endregion
 
     #region Public Methods
     public static NetworkManager GetNetworkManager()
@@ -180,7 +159,7 @@ public class ApplicationLogic : MonoBehaviour
         for (int i = 0; i < 34; i++)
         {
             await Task.Delay(2000);
-            var streamingAssetFile = Path.Combine(Application.streamingAssetsPath, Config.EnvironmentScene, $"frame{i}_skeletonsPoints3D.json");
+            var streamingAssetFile = Path.Combine(Application.streamingAssetsPath, config.EnvironmentScene, $"frame{i}_skeletonsPoints3D.json");
             var sensorFolderFile = Path.Combine(sensor.Folder, $"frame{i}_skeletonsPoints3D.json");
             File.Copy(streamingAssetFile, sensorFolderFile);
         }
@@ -189,7 +168,7 @@ public class ApplicationLogic : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode loadMode)
     {
-        if (scene.name.Equals(Config.EnvironmentScene))
+        if (scene.name.Equals(config.EnvironmentScene))
         {
             SceneManager.SetActiveScene(scene);
         }

@@ -50,7 +50,7 @@ public class SensorsManager : MonoBehaviour
 
         var root = await JSON.ParseFromFileAsync<RootObject>(filePath);
 
-        var currentRoom = ApplicationLogic.Config.EnvironmentScene;
+        var currentRoom = ApplicationConfig.Instance.EnvironmentScene;
         var room = root.Rooms.FirstOrDefault(x => x.ID.Equals(currentRoom));
 
         foreach (var sensor in room.Sensors)
