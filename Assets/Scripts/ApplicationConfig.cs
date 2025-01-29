@@ -9,6 +9,7 @@ using System.Net;
 using System.Linq;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
+using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 #endif
@@ -130,12 +131,14 @@ public class ApplicationConfig : ScriptableObject
                                 .Select(i => i.Address)
                                 .FirstOrDefault();
 
-        ServerAddress = address.ToString();
+        var config = AssetDatabase.LoadAssetAtPath<ApplicationConfig>("Assets/config.asset");
+        config.ServerAddress = address.ToString();
 
 #if UNITY_ANDROID
-        Mode = "Client"; // android has only client mode
+        config.Mode = "Client"; // android has only client mode
 #endif
 
+        AssetDatabase.SaveAssets();
     }
 #endif
 
