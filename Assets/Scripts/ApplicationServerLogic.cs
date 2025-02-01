@@ -86,10 +86,10 @@ public class ApplicationServerLogic : MonoBehaviour
         UpdateRigPositionConstraints(personRig, personData.skeleton, personObject.transform.localPosition);
         UpdateRigRotationConstraints(personRig);
 
-        if (personObject.TryGetComponent<Animator>(out var animator))
+        if (personObject.TryGetComponent<NetworkPersonBehaviour>(out var behaviour))
         {
-            // update the animator parameter "Fall"
-            animator.SetBool("Fall", personData.has_fallen);
+            // update the animator parameter "Fall" via network variable
+            behaviour.SetHasFallen(personData.has_fallen);
         }
     }
 

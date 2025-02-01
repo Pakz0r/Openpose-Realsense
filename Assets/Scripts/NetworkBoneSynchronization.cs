@@ -9,27 +9,20 @@ public class NetworkBoneSynchronization : NetworkBehaviour
     private NetworkVariable<float> positionWeight = new();
     private NetworkVariable<float> rotationWeight = new();
 
-    public void SetWeightPosition(float value)
-    {
-        positionWeight.Value = value;
-    }
-
-    public void SetWeightRotation(float value)
-    {
-        rotationWeight.Value = value;
-    }
-
+    #region Unity Lifecycle
     public override void OnNetworkSpawn()
     {
         constraint = this.GetComponent<OverrideTransform>();
 
         if (IsServer)
         {
-            // init variables
+            // sync variables with clients
             SetWeightPosition(constraint.weight);
             SetWeightRotation(constraint.data.rotationWeight);
             return;
         }
+
+        // only if application is running on client register handlers
 
         positionWeight.OnValueChanged -= OnNetworkBonePositionWeightChange;
         positionWeight.OnValueChanged += OnNetworkBonePositionWeightChange;
@@ -43,7 +36,25 @@ public class NetworkBoneSynchronization : NetworkBehaviour
         positionWeight.OnValueChanged -= OnNetworkBonePositionWeightChange;
         rotationWeight.OnValueChanged -= OnNetworkBonePositionWeightChange;
     }
+    #endregion
 
+    #region Public Methods
+    public void SetWeightPosition(float value)
+    {
+        if (!IsServer) return; // this method can only be called on server
+        positionWeight.Value = value;
+        constraint.weight = value;
+    }
+
+    public void SetWeightRotation(float value)
+    {
+        if (!IsServer) return; // this method can only be called on server
+        rotationWeight.Value = value;
+        constraint.data.rotationWeight = value;
+    }
+    #endregion
+
+    #region Private Methods
     private void OnNetworkBonePositionWeightChange(float previous, float current)
     {
         Debug.Log($"Detected NetworkVariable 'positionWeight' Change: Previous: {previous} | Current: {current}");
@@ -55,4 +66,5 @@ public class NetworkBoneSynchronization : NetworkBehaviour
         Debug.Log($"Detected NetworkVariable 'rotationWeight' Change: Previous: {previous} | Current: {current}");
         constraint.data.rotationWeight = current;
     }
+    #endregion
 }
