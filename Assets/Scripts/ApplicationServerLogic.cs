@@ -6,9 +6,7 @@ using UnityEngine;
 using OpenPose;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
-using UniRx.Triggers;
 using UniRx;
-using Cysharp.Threading.Tasks;
 
 public class ApplicationServerLogic : MonoBehaviour
 {
@@ -132,22 +130,30 @@ public class ApplicationServerLogic : MonoBehaviour
         var personTransform = personObject.transform;
 
         // eval rig position from hip bone
-        var hipBoneData = skeleton.FirstOrDefault(bone => bone.pointID == (int)OpenPoseBone.Hips);
         var rigPosition = personTransform.localPosition;
+        var hipBoneData = skeleton.FirstOrDefault(bone => bone.pointID == (int)OpenPoseBone.Hips);
+        var headBoneData = skeleton.FirstOrDefault(bone => bone.pointID == (int)OpenPoseBone.Head);
 
-        // update rigPosition only if confidence is over minimum
-        if (hipBoneData != null && hipBoneData.confidence > ApplicationConfig.Instance.MinConfidence)
-        {
-            rigPosition = new Vector3(hipBoneData.x, hipBoneData.y, hipBoneData.z);
-        }
-        else
-        {
-            // try eval rig position from head bone
-            var headBoneData = skeleton.FirstOrDefault(bone => bone.pointID == (int)OpenPoseBone.Head);
+        bool useHeadData = (hipBoneData == null && headBoneData != null) ||
+            (hipBoneData != null && headBoneData != null && headBoneData.confidence > hipBoneData.confidence);
 
-            if (headBoneData != null && headBoneData.confidence > ApplicationConfig.Instance.MinConfidence)
+        if (useHeadData)
+        {
+            if (headBoneData.confidence > ApplicationConfig.Instance.MinConfidence)
             {
+                // update rigPosition only if confidence is over minimum
                 rigPosition = new Vector3(headBoneData.x, 0.0f, headBoneData.z);
+
+                // is head data is used, prevent hip bone to move the body because it's the root object
+                if(hipBoneData != null) hipBoneData.confidence = 0f;
+            }
+        }
+        else if (hipBoneData != null)
+        {
+            if (hipBoneData.confidence > ApplicationConfig.Instance.MinConfidence)
+            {
+                // update rigPosition only if confidence is over minimum
+                rigPosition = new Vector3(hipBoneData.x, hipBoneData.y, hipBoneData.z);
             }
         }
 
@@ -178,11 +184,12 @@ public class ApplicationServerLogic : MonoBehaviour
 
                 if (boneObject.name == boneName)
                 {
-                    constraint.weight = boneData.confidence;
+                    // apply high pass filter for confidence on bone weight to prevent person floating in scene
+                    constraint.weight = boneData.confidence >= ApplicationConfig.Instance.MinConfidence ? boneData.confidence : 0f;
                     constraint.data.sourceObject.localPosition = new Vector3(boneData.x, boneData.y, boneData.z) - rigPosition;
 
                     if (boneObject.TryGetComponent<NetworkBoneSynchronization>(out var networkBone))
-                        networkBone.SetWeightPosition(boneData.confidence);
+                        networkBone.SetWeightPosition(constraint.weight);
 
                     break;
                 }

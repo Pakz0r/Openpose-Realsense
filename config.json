@@ -1,5 +1,5 @@
 {
     "Mode": "Server",
-    "MinConfidence": 0.5,
+    "MinConfidence": 0.4,
     "EnvironmentScene": "Laboratorio"
 }

@@ -1,14 +1,11 @@
 using System;
 using System.IO;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.XR.Management;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using Tymski;
 using Cysharp.Threading.Tasks;
-
-using static SensorsManager;
 
 public class ApplicationLogic : MonoBehaviour
 {
@@ -115,12 +112,6 @@ public class ApplicationLogic : MonoBehaviour
             if (!IsSceneLoaded(cameraLogicScene))
                 SceneManager.LoadScene(cameraLogicScene, LoadSceneMode.Additive);
         }
-
-#if UNITY_EDITOR
-        // setup sensor manager listner
-        SensorsManager.SensorCreated.RemoveListener(CreateSimulationOnSensorCreated);
-        SensorsManager.SensorCreated.AddListener(CreateSimulationOnSensorCreated);
-#endif
     }
 
     private void OnDisable()
@@ -141,33 +132,6 @@ public class ApplicationLogic : MonoBehaviour
     #endregion
 
     #region Private Methods
-#if UNITY_EDITOR
-    private async void CreateSimulationOnSensorCreated(Sensor sensor)
-    {
-        var directoryInfo = new DirectoryInfo(sensor.Folder);
-
-        if (directoryInfo.Exists)
-        {
-            foreach (var file in directoryInfo.GetFiles())
-            {
-                file.Delete();
-            }
-        }
-        else
-        {
-            Directory.CreateDirectory(sensor.Folder);
-        }
-
-        for (int i = 0; i < 34; i++)
-        {
-            await Task.Delay(2000);
-            var streamingAssetFile = Path.Combine(Application.streamingAssetsPath, config.EnvironmentScene, $"frame{i}_skeletonsPoints3D.json");
-            var sensorFolderFile = Path.Combine(sensor.Folder, $"frame{i}_skeletonsPoints3D.json");
-            File.Copy(streamingAssetFile, sensorFolderFile);
-        }
-    }
-#endif
-
     private void OnSceneLoaded(Scene scene, LoadSceneMode loadMode)
     {
         if (scene.name.Equals(config.EnvironmentScene))

@@ -16,5 +16,5 @@ MonoBehaviour:
   <MinConfidence>k__BackingField: 0.5
   <EnvironmentScene>k__BackingField: Laboratorio
   <DisableEnvironmentScene>k__BackingField: 0
-  <ServerAddress>k__BackingField: 192.168.75.189
+  <ServerAddress>k__BackingField: 127.0.0.1
   <ServerPort>k__BackingField: 7777
