@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine.Animations.Rigging;
 using UnityEngine;
 using Unity.Netcode;
@@ -55,15 +56,19 @@ public class NetworkBoneSynchronization : NetworkBehaviour
     #endregion
 
     #region Private Methods
-    private void OnNetworkBonePositionWeightChange(float previous, float current)
+    // Control the bone position weight parameter (to be executed on main thread cause unity JOB system)
+    private async void OnNetworkBonePositionWeightChange(float previous, float current)
     {
-        Debug.Log($"Detected NetworkVariable 'positionWeight' Change: Previous: {previous} | Current: {current}");
+        await UniTask.Yield();
+        Debug.Log($"Detected NetworkVariable 'positionWeight' change for '{this.name}' (Prev: {previous} | Current: {current})");
         constraint.weight = current;
     }
 
-    private void OnNetworkBoneRotationWeightChange(float previous, float current)
+    // Control the bone rotation weight parameter (to be executed on main thread cause unity JOB system)
+    private async void OnNetworkBoneRotationWeightChange(float previous, float current)
     {
-        Debug.Log($"Detected NetworkVariable 'rotationWeight' Change: Previous: {previous} | Current: {current}");
+        await UniTask.Yield();
+        Debug.Log($"Detected NetworkVariable 'rotationWeight' change for '{this.name}' (Prev: {previous} | Current: {current})");
         constraint.data.rotationWeight = current;
     }
     #endregion

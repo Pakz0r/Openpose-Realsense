@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -41,8 +42,9 @@ public class NetworkPersonBehaviour : NetworkBehaviour
     #endregion
 
     #region Private Methods
-    private void OnNetworkAnimatorHasFallParameterChange(bool previous, bool current)
+    private async void OnNetworkAnimatorHasFallParameterChange(bool previous, bool current)
     {
+        await UniTask.Yield();
         Debug.Log($"Detected NetworkVariable 'hasFallen' Change: Previous: {previous} | Current: {current}");
         animator.SetBool("Fall", current);
     }
