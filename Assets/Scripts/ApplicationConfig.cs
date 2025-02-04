@@ -98,15 +98,12 @@ public class ApplicationConfig : ScriptableObject
         if (ServerPort == 0)
             ServerPort = 7777; // default server port
 
-#if UNITY_ANDROID
-
-#if !UNITY_EDITOR
+#if UNITY_ANDROID && !UNITY_EDITOR
         Mode = "Client"; // android has only client mode
 #endif
 
         if (!configFileExists)
             SaveToFile(); // on android devices save config on first time load (to simplify testing) 
-#endif
     }
 
     public async void SaveToFile() => await JSON.ComposeToFileAsync(
