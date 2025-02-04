@@ -1,31 +1,26 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using System.Linq;
-
-
-#if !UNITY_EDITOR // Strip this class in build
-
-public class SensorSimulator : MonoBehaviour {}
-
-#else
-
-using Cysharp.Threading.Tasks;
-using System;
 using System.IO;
+using System;
 
 using static SensorsManager;
 
 public class SensorSimulator : MonoBehaviour
 {
     #region Private Fields
-    private string environmentScene = ApplicationConfig.Instance.EnvironmentScene;
+    private string environmentScene;
     private bool sensorRegistered = false;
     private int simulatedFrameCount = 0;
     private int frameId = 0;
     #endregion
 
     #region Unity Lifecycle
+#if UNITY_EDITOR
     private void OnEnable()
     {
+        environmentScene = ApplicationConfig.Instance.EnvironmentScene;
+
         // setup sensor manager listner
         SensorCreated.RemoveListener(CreateSimulationOnSensorCreated);
         SensorCreated.AddListener(CreateSimulationOnSensorCreated);
@@ -51,12 +46,12 @@ public class SensorSimulator : MonoBehaviour
 
             GUILayout.BeginHorizontal();
 
-            if(GUILayout.Button("Previus Frame") && frameId > 0)
+            if (GUILayout.Button("Previus Frame") && frameId > 0)
             {
                 frameId--;
             }
 
-            if(GUILayout.Button("Next Frame") && frameId < simulatedFrameCount)
+            if (GUILayout.Button("Next Frame") && frameId < simulatedFrameCount)
             {
                 frameId++;
             }
@@ -66,6 +61,7 @@ public class SensorSimulator : MonoBehaviour
 
         GUILayout.EndArea();
     }
+#endif
     #endregion
 
     #region Private Methods
@@ -135,4 +131,3 @@ public class SensorSimulator : MonoBehaviour
     }
     #endregion
 }
-#endif
