@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine.Animations.Rigging;
 using UnityEngine;
 using Unity.Netcode;
+using static UnityEngine.Rendering.DebugUI;
 
 [RequireComponent(typeof(OverrideTransform))]
 public class NetworkBoneSynchronization : NetworkBehaviour
@@ -27,9 +28,11 @@ public class NetworkBoneSynchronization : NetworkBehaviour
 
         positionWeight.OnValueChanged -= OnNetworkBonePositionWeightChange;
         positionWeight.OnValueChanged += OnNetworkBonePositionWeightChange;
+        constraint.weight = positionWeight.Value; // update constraint value on spawn
 
         rotationWeight.OnValueChanged -= OnNetworkBoneRotationWeightChange;
         rotationWeight.OnValueChanged += OnNetworkBoneRotationWeightChange;
+        constraint.data.rotationWeight = rotationWeight.Value; // update constraint value on spawn
     }
 
     public override void OnNetworkDespawn()
@@ -43,6 +46,7 @@ public class NetworkBoneSynchronization : NetworkBehaviour
     public void SetWeightPosition(float value)
     {
         if (!IsServer) return; // this method can only be called on server
+        positionWeight.Value = value + 0.1f; // force value change event
         positionWeight.Value = value;
         constraint.weight = value;
     }
@@ -50,6 +54,7 @@ public class NetworkBoneSynchronization : NetworkBehaviour
     public void SetWeightRotation(float value)
     {
         if (!IsServer) return; // this method can only be called on server
+        rotationWeight.Value = value + 0.1f; // force value change event
         rotationWeight.Value = value;
         constraint.data.rotationWeight = value;
     }

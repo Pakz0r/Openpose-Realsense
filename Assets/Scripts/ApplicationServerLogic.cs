@@ -72,7 +72,7 @@ public class ApplicationServerLogic : MonoBehaviour
         personObject.transform.SetParent(sender.transform);
 
         // update person transform
-        UpdatePersonObjectTransform(personObject, personData.skeleton, personData.face_rotation);
+        UpdatePersonObjectTransform(personObject, ref personData.skeleton, personData.face_rotation);
 
         // get person object rig
         Rig personRig = personObject.GetComponentInChildren<Rig>();
@@ -125,7 +125,7 @@ public class ApplicationServerLogic : MonoBehaviour
         return personObject;
     }
 
-    private static void UpdatePersonObjectTransform(GameObject personObject, BoneData[] skeleton, FaceRotation rotation)
+    private static void UpdatePersonObjectTransform(GameObject personObject, ref BoneData[] skeleton, FaceRotation rotation)
     {
         var personTransform = personObject.transform;
 
@@ -134,8 +134,7 @@ public class ApplicationServerLogic : MonoBehaviour
         var hipBoneData = skeleton.FirstOrDefault(bone => bone.pointID == (int)OpenPoseBone.Hips);
         var headBoneData = skeleton.FirstOrDefault(bone => bone.pointID == (int)OpenPoseBone.Head);
 
-        bool useHeadData = (hipBoneData == null && headBoneData != null) ||
-            (hipBoneData != null && headBoneData != null && headBoneData.confidence > hipBoneData.confidence);
+        bool useHeadData = headBoneData.confidence > hipBoneData.confidence;
 
         if (useHeadData)
         {
@@ -145,16 +144,13 @@ public class ApplicationServerLogic : MonoBehaviour
                 rigPosition = new Vector3(headBoneData.x, 0.0f, headBoneData.z);
 
                 // is head data is used, prevent hip bone to move the body because it's the root object
-                if(hipBoneData != null) hipBoneData.confidence = 0f;
+                hipBoneData.confidence = 0f;
             }
         }
-        else if (hipBoneData != null)
+        else if (hipBoneData.confidence > ApplicationConfig.Instance.MinConfidence)
         {
-            if (hipBoneData.confidence > ApplicationConfig.Instance.MinConfidence)
-            {
-                // update rigPosition only if confidence is over minimum
-                rigPosition = new Vector3(hipBoneData.x, hipBoneData.y, hipBoneData.z);
-            }
+            // update rigPosition only if confidence is over minimum
+            rigPosition = new Vector3(hipBoneData.x, hipBoneData.y, hipBoneData.z);
         }
 
         // eval rig rotation from face rotation
