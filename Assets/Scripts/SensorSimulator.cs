@@ -65,7 +65,7 @@ public class SensorSimulator : MonoBehaviour
     #endregion
 
     #region Private Methods
-    private async void CreateSimulationOnSensorCreated(Sensor sensor)
+    private async void CreateSimulationOnSensorCreated(SensorInfo sensor)
     {
         if (sensorRegistered)
         {

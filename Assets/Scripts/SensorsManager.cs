@@ -18,23 +18,29 @@ public class SensorsManager : MonoBehaviour
     public class RoomSensors
     {
         public string ID;
-        public Sensor[] Sensors;
+        public SensorInfo[] Sensors;
     }
 
     [Serializable]
-    public class Sensor
+    public class SensorInfo
     {
         public string ID;
         public string Folder;
-        public Vector3 Position;
-        public Vector3 Rotation;
-        public Vector3 Offset;
+        public WorldPoint Transform;
+        public WorldPoint Offset;
+
+        [Serializable]
+        public class WorldPoint
+        {
+            public Vector3 Position;
+            public Vector3 Rotation;
+        }
     }
     #endregion
 
     #region Public Fields
-    public static UnityEvent<Sensor> SensorInitialized = new();
-    public static UnityEvent<Sensor> SensorCreated = new();
+    public static UnityEvent<SensorInfo> SensorInitialized = new();
+    public static UnityEvent<SensorInfo> SensorCreated = new();
     #endregion
 
     #region Unity Lifecycle
@@ -61,8 +67,8 @@ public class SensorsManager : MonoBehaviour
                 var sensorObject = new GameObject($"DepthCamera_{sensor.ID}");
                 sensorObject.transform.SetParent(this.transform);
                 sensorObject.transform.SetLocalPositionAndRotation(
-                    new Vector3(sensor.Position.x, sensor.Position.y, sensor.Position.z),
-                    Quaternion.Euler(new Vector3(sensor.Rotation.x, sensor.Rotation.y, sensor.Rotation.z))
+                    new Vector3(sensor.Transform.Position.x, sensor.Transform.Position.y, sensor.Transform.Position.z),
+                    Quaternion.Euler(new Vector3(sensor.Transform.Rotation.x, sensor.Transform.Rotation.y, sensor.Transform.Rotation.z))
                 );
 
                 // add camera to check frames result
@@ -72,10 +78,10 @@ public class SensorsManager : MonoBehaviour
                 var sensorOffset = new GameObject("Offset");
                 sensorOffset.transform.SetParent(sensorObject.transform);
 
-                sensor.Offset.y = 1f - sensor.Position.y; // the sum of Y position and offset must be 1.0
+                sensor.Offset.Position.y = 1f - sensor.Transform.Position.y; // the sum of Y position and offset must be 1.0
 
                 sensorOffset.transform.SetLocalPositionAndRotation(
-                    new Vector3(sensor.Offset.x, sensor.Offset.y, sensor.Offset.z),
+                    new Vector3(sensor.Offset.Position.x, sensor.Offset.Position.y, sensor.Offset.Position.z),
                     Quaternion.identity
                 );
 
@@ -84,7 +90,7 @@ public class SensorsManager : MonoBehaviour
 
                 // setup camera watcher
                 var watcher = sensorOffset.AddComponent<SensorWatcher>();
-                watcher.SetupWatcher(sensor.Folder);
+                watcher.SetupWatcher(sensor);
 
                 // invoke sensor initialized event
                 SensorInitialized?.Invoke(sensor);

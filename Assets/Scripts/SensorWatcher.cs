@@ -6,6 +6,8 @@ using Cysharp.Threading.Tasks;
 using Utilities.Parser;
 using OpenPose;
 
+using static SensorsManager;
+
 public class SensorWatcher : MonoBehaviour
 {
     #region Serialized Fields
@@ -16,6 +18,10 @@ public class SensorWatcher : MonoBehaviour
     #region Public Events
     public static UnityEvent<SensorWatcher, FrameSkeletonsPoints3D> FrameReaded = new();
     public static UnityEvent<SensorWatcher, PeopleData> PersonUpdated = new();
+    #endregion
+
+    #region Public Fields
+    public SensorInfo Info { get; private set; }
     #endregion
 
     #region Private Fields
@@ -30,21 +36,29 @@ public class SensorWatcher : MonoBehaviour
     #endregion
 
     #region Public Methods
-    public void SetupWatcher(string path)
+    public void SetupWatcher(SensorInfo sensor)
     {
-        if (string.IsNullOrEmpty(path))
+        if(sensor == null)
+        {
+            Debug.LogError("Sensor data is invalid");
+            return;
+        }
+
+        Info = sensor;
+
+        if (string.IsNullOrEmpty(sensor.Folder))
         {
             Debug.LogError("Sensor directory root is invalid");
             return;
         }
 
-        if (!Directory.Exists(path))
+        if (!Directory.Exists(sensor.Folder))
         {
             Debug.LogError("Sensor directory root does not exists");
             return;
         }
 
-        watcher = new(path);
+        watcher = new(sensor.Folder);
 
         watcher.Created += OnFileCreated;
         watcher.Error += OnWatcherError;

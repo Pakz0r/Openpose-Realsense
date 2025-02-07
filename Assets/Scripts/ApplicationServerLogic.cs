@@ -83,6 +83,9 @@ public class ApplicationServerLogic : MonoBehaviour
             return;
         }
 
+        // update person rig to match bone and mesh rotation (because the room may have a rotation offset)
+        personRig.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(sender.Info.Offset.Rotation));
+
         UpdateRigPositionConstraints(personRig, personData.skeleton, personObject.transform.localPosition);
         UpdateRigRotationConstraints(personRig);
 
@@ -153,9 +156,8 @@ public class ApplicationServerLogic : MonoBehaviour
             rigPosition = new Vector3(hipBoneData.x, hipBoneData.y, hipBoneData.z);
         }
 
-        // eval rig rotation from face rotation
-        var angle = Mathf.Rad2Deg * rotation.yaw; // to degree
-        var rigRotation = Quaternion.Euler(0.0f, angle, 0.0f);
+        // eval rig rotation from face rotation (angles are evaluated into the direction of the camera so are 180° wrong)
+        var rigRotation = Quaternion.Euler(0.0f, rotation.yaw + 180f, 0.0f);
 
         // update person transform
         personTransform.SetLocalPositionAndRotation(rigPosition, rigRotation);
@@ -202,15 +204,19 @@ public class ApplicationServerLogic : MonoBehaviour
             if (!Enum.TryParse<OpenPoseBone>(boneObject.name, true, out var boneId))
                 continue;
 
+            // get constraint gameobject
+            if (!boneObject.TryGetComponent<OverrideTransform>(out var constraint))
+                continue;
+
             // check for bone to look at
             var boneTargetId = boneId.GetLookAtBoneFrom();
 
             if (boneTargetId == OpenPoseBone.Invalid)
+            {
+                // if bone has no rotation constraint ignore rotation
+                constraint.data.rotationWeight = 0.0f;
                 continue;
-
-            // get constraint gameobject
-            if (!boneObject.TryGetComponent<OverrideTransform>(out var constraint))
-                continue;
+            }
 
             var boneTargetName = Enum.GetName(typeof(OpenPoseBone), boneTargetId);
 
