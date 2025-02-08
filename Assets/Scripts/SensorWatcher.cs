@@ -17,7 +17,7 @@ public class SensorWatcher : MonoBehaviour
 
     #region Public Events
     public static UnityEvent<SensorWatcher, FrameSkeletonsPoints3D> FrameReaded = new();
-    public static UnityEvent<SensorWatcher, PeopleData> PersonUpdated = new();
+    public static UnityEvent<SensorWatcher, PersonData> PersonUpdated = new();
     #endregion
 
     #region Public Fields

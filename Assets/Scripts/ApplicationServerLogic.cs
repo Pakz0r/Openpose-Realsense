@@ -47,7 +47,7 @@ public class ApplicationServerLogic : MonoBehaviour
     #endregion
 
     #region Private Methods
-    private void DrawPerson(SensorWatcher sender, PeopleData personData)
+    private void DrawPerson(SensorWatcher sender, PersonData personData)
     {
         if (personData == null)
         {
@@ -58,6 +58,21 @@ public class ApplicationServerLogic : MonoBehaviour
         // eval frame confidence
         var avgConfidence = personData.skeleton.Average((bone) => bone.confidence);
         Debug.Log($"Person {personData.personID} new frame average confidence: {avgConfidence}");
+
+        if(avgConfidence < ApplicationConfig.Instance.MinConfidence)
+        {
+            if (ExistsPerson(personData.personID))
+            {
+                DestroyPersonIfExists(personData.personID);
+                Debug.Log($"Person {personData.personID} has been removed from the scene");
+            }
+            else
+            {
+                Debug.Log($"Person {personData.personID} spawn abort");
+            }
+
+            return;
+        }
 
         // create person if not exists
         var personObject = CreatePersonIfNotExists(personData.personID);
@@ -86,8 +101,8 @@ public class ApplicationServerLogic : MonoBehaviour
         // update person rig to match bone and mesh rotation (because the room may have a rotation offset)
         personRig.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(sender.Info.Offset.Rotation));
 
-        UpdateRigPositionConstraints(personRig, personData.skeleton, personObject.transform.localPosition);
-        UpdateRigRotationConstraints(personRig);
+        UpdateRigPositionConstraints(personRig.transform, personData.skeleton, personObject.transform.localPosition);
+        UpdateRigRotationConstraints(personRig.transform);
 
         if (personObject.TryGetComponent<NetworkPersonBehaviour>(out var behaviour))
         {
@@ -110,6 +125,23 @@ public class ApplicationServerLogic : MonoBehaviour
         if (label != null) label.SetPlayerName(personName);
 
         return personObject;
+    }
+
+    private bool ExistsPerson(int personID)
+    {
+        var personName = $"Person {personID}";
+        return peoples.ContainsKey(personName);
+    }
+
+    private bool DestroyPersonIfExists(int personID)
+    {
+        var personName = $"Person {personID}";
+
+        if (!peoples.ContainsKey(personName))
+            return false;
+
+        Destroy(peoples[personName]);
+        return peoples.Remove(personName);
     }
 
     private GameObject CreatePerson(int personID)
@@ -146,8 +178,10 @@ public class ApplicationServerLogic : MonoBehaviour
                 // update rigPosition only if confidence is over minimum
                 rigPosition = new Vector3(headBoneData.x, 0.0f, headBoneData.z);
 
-                // is head data is used, prevent hip bone to move the body because it's the root object
-                hipBoneData.confidence = 0f;
+                // if head data is used, prevent hip bone to move the body because it's the root object
+                hipBoneData.x = rigPosition.x; // align hip to rig position
+                hipBoneData.y = rigPosition.y; // align hip to rig position
+                hipBoneData.z = rigPosition.z; // align hip to rig position
             }
         }
         else if (hipBoneData.confidence > ApplicationConfig.Instance.MinConfidence)
@@ -164,107 +198,63 @@ public class ApplicationServerLogic : MonoBehaviour
         personTransform.localScale = Vector3.one;
     }
 
-    private static void UpdateRigPositionConstraints(Rig personRig, BoneData[] skeleton, Vector3 rigPosition)
+    private static void UpdateRigPositionConstraints(Transform parentRig, BoneData[] skeleton, Vector3 rigPosition)
     {
-        for (var childId = 0; childId < personRig.transform.childCount; childId++)
+        foreach (Transform boneObject in parentRig)
         {
-            var boneObject = personRig.transform.GetChild(childId);
-
-            // get constraint gameobject
-            if (!boneObject.TryGetComponent<OverrideTransform>(out var constraint))
+            if (!Enum.TryParse<OpenPoseBone>(boneObject.name, out var boneId))
                 continue;
 
             // query skeleton data
-            foreach (var boneData in skeleton)
+            var boneData = skeleton.FirstOrDefault(bone => bone.pointID == (int)boneId);
+
+            // apply bone position
+            boneObject.localPosition = new Vector3(boneData.x, boneData.y, boneData.z) - rigPosition;
+
+            if (boneObject.TryGetComponent<NetworkBoneSynchronization>(out var networkBone))
             {
-                var boneId = (OpenPoseBone)boneData.pointID;
-                var boneName = Enum.GetName(typeof(OpenPoseBone), boneData.pointID);
+                // apply high pass filter for confidence on bone weight to prevent person floating in scene
+                var weight = boneData.confidence >= ApplicationConfig.Instance.MinConfidence ? boneData.confidence : 0f;
 
-                if (boneObject.name == boneName)
-                {
-                    // apply high pass filter for confidence on bone weight to prevent person floating in scene
-                    constraint.weight = boneData.confidence >= ApplicationConfig.Instance.MinConfidence ? boneData.confidence : 0f;
-                    constraint.data.sourceObject.localPosition = new Vector3(boneData.x, boneData.y, boneData.z) - rigPosition;
-
-                    if (boneObject.TryGetComponent<NetworkBoneSynchronization>(out var networkBone))
-                        networkBone.SetWeightPosition(constraint.weight);
-
-                    break;
-                }
+                // set position constraint weight
+                networkBone.SetWeightPosition(weight);
             }
         }
     }
 
-    private static void UpdateRigRotationConstraints(Rig personRig)
+    private static void UpdateRigRotationConstraints(Transform parentRig)
     {
-        for (var childId = 0; childId < personRig.transform.childCount; childId++)
+        foreach (Transform boneObject in parentRig)
         {
-            var boneObject = personRig.transform.GetChild(childId);
-
             if (!Enum.TryParse<OpenPoseBone>(boneObject.name, true, out var boneId))
                 continue;
 
-            // get constraint gameobject
-            if (!boneObject.TryGetComponent<OverrideTransform>(out var constraint))
-                continue;
+            var weight = 0f; // by default ignore rotation
 
             // check for bone to look at
             var boneTargetId = boneId.GetLookAtBoneFrom();
 
-            if (boneTargetId == OpenPoseBone.Invalid)
+            if (boneTargetId != OpenPoseBone.Invalid)
             {
-                // if bone has no rotation constraint ignore rotation
-                constraint.data.rotationWeight = 0.0f;
-                continue;
-            }
+                var boneTargetName = Enum.GetName(typeof(OpenPoseBone), boneTargetId);
 
-            var boneTargetName = Enum.GetName(typeof(OpenPoseBone), boneTargetId);
-
-            // query rig childs transforms
-            for (var targetId = 0; targetId < personRig.transform.childCount; targetId++)
-            {
-                var targetBone = personRig.transform.GetChild(targetId);
-
-                if (targetBone.name == boneTargetName)
+                // query rig childs transforms to search for target bone
+                foreach (Transform targetBone in parentRig)
                 {
-                    constraint.data.sourceObject.LookAt(targetBone);
-
-                    switch (boneId)
-                    {
-                        case OpenPoseBone.LeftShoulder:
-                            // upper left side is specular on Y asix
-                            constraint.data.sourceObject.Rotate(Vector3.up, 180f);
-                            break;
-
-                        case OpenPoseBone.LeftLowerArm:
-                            // upper left side is specular on Y asix
-                            constraint.data.sourceObject.Rotate(Vector3.up, 180f);
-                            break;
-
-                        case OpenPoseBone.RightUpperLeg:
-                        case OpenPoseBone.LeftUpperLeg:
-                            // lower side is specular on X asix
-                            constraint.data.sourceObject.Rotate(Vector3.right, 180f);
-                            break;
-                    }
+                    if (targetBone.name != boneTargetName)
+                        continue;
 
                     // update bone rotation constraint weight based on target weight
                     if (targetBone.TryGetComponent<OverrideTransform>(out var targetConstraint))
-                    {
-                        constraint.data.rotationWeight = targetConstraint.weight;
-                    }
-                    else // reset bone rotation constraint weight
-                    {
-                        constraint.data.rotationWeight = 1.0f;
-                    }
-
-                    // update network bone rotation weight
-                    if (boneObject.TryGetComponent<NetworkBoneSynchronization>(out var networkBone))
-                        networkBone.SetWeightRotation(constraint.data.rotationWeight);
+                        weight = targetConstraint.weight;
 
                     break;
                 }
             }
+
+            // update network bone rotation weight
+            if (boneObject.TryGetComponent<NetworkBoneSynchronization>(out var networkBone))
+                networkBone.SetWeightRotation(weight);
         }
     }
     #endregion

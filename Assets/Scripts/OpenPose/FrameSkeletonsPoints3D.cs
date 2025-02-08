@@ -7,11 +7,11 @@ namespace OpenPose
     {
         public int ID_Frame;
         public string thingId;
-        public PeopleData[] People;
+        public PersonData[] People;
     }
 
     [Serializable]
-    public class PeopleData
+    public class PersonData
     {
         public int personID;
         public bool has_fallen;

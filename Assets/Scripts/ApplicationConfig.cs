@@ -81,7 +81,7 @@ public class ApplicationConfig : ScriptableObject
                 if (!string.IsNullOrEmpty(temp.Mode))
                     Mode = temp.Mode;
 
-                if (temp.MinConfidence <= 0f)
+                if (temp.MinConfidence >= 0f)
                     MinConfidence = temp.MinConfidence;
 
                 if (!string.IsNullOrEmpty(temp.EnvironmentScene))
@@ -90,7 +90,7 @@ public class ApplicationConfig : ScriptableObject
                 if (!string.IsNullOrEmpty(temp.ServerAddress))
                     ServerAddress = temp.ServerAddress;
 
-                if (temp.ServerPort <= 0)
+                if (temp.ServerPort >= 0)
                     ServerPort = temp.ServerPort;
             }
         }

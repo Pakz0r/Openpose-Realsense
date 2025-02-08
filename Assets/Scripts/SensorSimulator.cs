@@ -8,11 +8,15 @@ using static SensorsManager;
 
 public class SensorSimulator : MonoBehaviour
 {
-    #region Private Fields
+    #region Serialized Fields
+    [SerializeField]
     private string environmentScene;
+    [SerializeField]
     private bool sensorRegistered = false;
+    [SerializeField]
     private int simulatedFrameCount = 0;
-    private int frameId = 0;
+    [SerializeField]
+    private int frameId;
     #endregion
 
     #region Unity Lifecycle

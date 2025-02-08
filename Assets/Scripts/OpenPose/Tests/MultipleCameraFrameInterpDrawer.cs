@@ -76,11 +76,11 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
 
                 processedFrame.ID_Frame = currentFrame.ID_Frame;
                 processedFrame.thingId = currentFrame.thingId;
-                processedFrame.People = new PeopleData[currentFrame.People.Length];
+                processedFrame.People = new PersonData[currentFrame.People.Length];
 
                 for (int i = 0; i < currentFrame.People.Length; i++)
                 {
-                    processedFrame.People[i] = new PeopleData();
+                    processedFrame.People[i] = new PersonData();
                     var person = processedFrame.People[i];
                     var current = currentFrame.People[i];
 
@@ -151,7 +151,7 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
         interpolationTime = 0;
     }
 
-    private void DrawPerson(PeopleData personData)
+    private void DrawPerson(PersonData personData)
     {
         if (personData == null)
         {
