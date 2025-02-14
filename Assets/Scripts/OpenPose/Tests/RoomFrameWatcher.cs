@@ -165,8 +165,9 @@ public class RoomFrameWatcher : MonoBehaviour
             {
                 if (boneData.confidence > 0)
                 {
+                    var boneId = (OpenPoseBone)boneData.pointID;
                     var boneObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    boneObject.name = Enum.GetName(typeof(OpenPoseBone), boneData.pointID); //$"Bone {boneData.pointID}";
+                    boneObject.name = boneId.GetBoneName(); //$"Bone {boneData.pointID}";
                     boneObject.transform.parent = personObject.transform;
                     boneObject.transform.SetLocalPositionAndRotation(new Vector3(boneData.x, boneData.y, boneData.z), Quaternion.identity);
                     boneObject.transform.localScale = Vector3.one * 0.05f;

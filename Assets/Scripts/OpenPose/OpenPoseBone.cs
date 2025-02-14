@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 
 public enum OpenPoseBone {
     Head = 0,
@@ -61,6 +62,8 @@ public enum OpenPoseBodyKeypoint
 
 public static class OpenPoseBoneUtilities
 {
+    private static readonly Type openPoseBoneType = typeof(OpenPoseBone);
+
     private static readonly Dictionary<OpenPoseBone, OpenPoseBone> lookAtDict = new()
     {
         [OpenPoseBone.RightShoulder] = OpenPoseBone.RightLowerArm,
@@ -73,8 +76,24 @@ public static class OpenPoseBoneUtilities
         [OpenPoseBone.LeftLowerLeg] = OpenPoseBone.LeftFoot,
     };
 
+    private static readonly Dictionary<OpenPoseBone, OpenPoseBone> followDirectionOfDict = new()
+    {
+        [OpenPoseBone.LeftHand] = OpenPoseBone.LeftLowerArm,
+        [OpenPoseBone.RightHand] = OpenPoseBone.RightLowerArm,
+    };
+
     public static OpenPoseBone GetLookAtBoneFrom(this OpenPoseBone bone)
     {
         return lookAtDict.GetValueOrDefault(bone, OpenPoseBone.Invalid);
+    }
+
+    public static OpenPoseBone GetBoneToFollow(this OpenPoseBone bone)
+    {
+        return followDirectionOfDict.GetValueOrDefault(bone, OpenPoseBone.Invalid);
+    }
+
+    public static string GetBoneName(this OpenPoseBone bone)
+    {
+        return Enum.GetName(openPoseBoneType, bone);
     }
 }

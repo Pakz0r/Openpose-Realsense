@@ -201,7 +201,7 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
             if (!boneObject.TryGetComponent<OverrideTransform>(out var constraint))
                 continue;
 
-            var boneTargetName = Enum.GetName(typeof(OpenPoseBone), boneTargetId);
+            var boneTargetName = boneTargetId.GetBoneName();
 
             // query rig childs transforms
             for (var targetId = 0; targetId < personRig.transform.childCount; targetId++)
@@ -250,7 +250,7 @@ public class MultipleCameraFrameInterpDrawer : MonoBehaviour
             foreach (var boneData in skeleton)
             {
                 var boneId = (OpenPoseBone)boneData.pointID;
-                var boneName = Enum.GetName(typeof(OpenPoseBone), boneData.pointID);
+                var boneName = boneId.GetBoneName();
 
                 if (boneObject.name == boneName)
                 {

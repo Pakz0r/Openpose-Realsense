@@ -1,12 +1,12 @@
+using Unity.Netcode.Transports.UTP;
+using Unity.Netcode;
+using UnityEngine.Animations.Rigging;
+using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using UnityEngine.Animations.Rigging;
-using UnityEngine;
-using OpenPose;
-using Unity.Netcode;
-using Unity.Netcode.Transports.UTP;
 using UniRx;
+using OpenPose;
 
 public class ApplicationServerLogic : MonoBehaviour
 {
@@ -236,19 +236,38 @@ public class ApplicationServerLogic : MonoBehaviour
 
             if (boneTargetId != OpenPoseBone.Invalid)
             {
-                var boneTargetName = Enum.GetName(typeof(OpenPoseBone), boneTargetId);
+                var boneTargetName = boneTargetId.GetBoneName();
 
                 // query rig childs transforms to search for target bone
-                foreach (Transform targetBone in parentRig)
+                foreach (Transform bone in parentRig)
                 {
-                    if (targetBone.name != boneTargetName)
+                    if (bone.name != boneTargetName)
                         continue;
 
                     // update bone rotation constraint weight based on target weight
-                    if (targetBone.TryGetComponent<OverrideTransform>(out var targetConstraint))
-                        weight = targetConstraint.weight;
+                    if (bone.TryGetComponent<OverrideTransform>(out var constraint))
+                        weight = constraint.weight;
 
                     break;
+                }
+            }
+
+            // check for bone to follow up
+            var boneFollowedId = boneId.GetBoneToFollow();
+
+            if (boneFollowedId != OpenPoseBone.Invalid)
+            {
+                var boneFollowedName = boneFollowedId.GetBoneName();
+
+                // query rig childs transforms to search for followed bone
+                foreach (Transform bone in parentRig)
+                {
+                    if (bone.name != boneFollowedName)
+                        continue;
+
+                    // update bone rotation constraint weight based on followed weight
+                    if (bone.TryGetComponent<OverrideTransform>(out var constraint))
+                        weight = constraint.weight;
                 }
             }
 

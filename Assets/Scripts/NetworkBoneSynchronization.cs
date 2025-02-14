@@ -11,7 +11,11 @@ public class NetworkBoneSynchronization : NetworkBehaviour
     [SerializeField]
     private OpenPoseBone boneId;
     [SerializeField]
+    [Tooltip("The bone to target at")]
     private Transform targetBone;
+    [SerializeField]
+    [Tooltip("The bone to follow up")]
+    private Transform followedBone;
     #endregion
 
     #region Private Fields
@@ -38,7 +42,7 @@ public class NetworkBoneSynchronization : NetworkBehaviour
 
         if (boneTargetId != OpenPoseBone.Invalid)
         {
-            var boneTargetName = Enum.GetName(typeof(OpenPoseBone), boneTargetId);
+            var boneTargetName = boneTargetId.GetBoneName();
 
             // query rig childs transforms to search for target bone
             foreach (Transform bone in this.transform.parent)
@@ -46,6 +50,25 @@ public class NetworkBoneSynchronization : NetworkBehaviour
                 if (bone.name == boneTargetName)
                 {
                     targetBone = bone;
+                    break;
+                }
+            }
+        }
+
+        // check for bone to follow up
+        var boneFollowedId = boneId.GetBoneToFollow();
+
+        if(boneFollowedId != OpenPoseBone.Invalid)
+        {
+            var boneFollowedName = boneFollowedId.GetBoneName();
+
+            // query rig childs transforms to search for followed bone
+            foreach (Transform bone in this.transform.parent)
+            {
+                if (bone.name == boneFollowedName)
+                {
+                    followedBone = bone;
+                    break;
                 }
             }
         }
@@ -84,6 +107,11 @@ public class NetworkBoneSynchronization : NetworkBehaviour
         {
             var direction = (targetBone.position - this.transform.position).normalized; // eval direction from bone to target
             this.transform.up = direction; // update the bone forward (up) to point at target bone
+        }
+
+        if(followedBone != null)
+        {
+            this.transform.up = followedBone.up;
         }
 
         if (constraint != null)
