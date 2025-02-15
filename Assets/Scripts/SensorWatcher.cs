@@ -54,8 +54,8 @@ public class SensorWatcher : MonoBehaviour
 
         if (!Directory.Exists(sensor.Folder))
         {
-            Debug.LogError("Sensor directory root does not exists");
-            return;
+            Debug.LogWarning($"Created missing sensor directory '{sensor.Folder}'");
+            Directory.CreateDirectory(sensor.Folder);
         }
 
         watcher = new(sensor.Folder);

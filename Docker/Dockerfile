@@ -1,25 +1,34 @@
-# Usa Alpine o un'altra immagine base
-FROM alpine:3.18
+# Usa Debian o un'altra immagine base compatibile con piattaforma x86_64
+FROM debian:bookworm-slim
 
-# Installa le dipendenze necessarie
-RUN apk add --no-cache \
-    libstdc++ \
-    libc6-compat \
-    libgcc \
-    libcurl \
+# Installa le librerie necessarie per AIWatch Server
+RUN apt-get update && apt-get install -y \
+    libstdc++6 \
+    libc6 \
+    libgcc1 \
+    libcurl4 \
+    inotify-tools \
+    libc-bin \
     openssl \
     curl \
-    bash
+    bash \
+    && rm -rf /var/lib/apt/lists/*
 
 # Configura la directory di lavoro
 WORKDIR /app
 
-# Copia i file della build Unity
-COPY ./Builds/Dedicated-Server-Linux/ /app/
+# Copia i file della build Unity nel container
+COPY ./Build/ /app/
 
-# Espone le porte richieste
+# Assegna i permessi di esecuzione al server Unity
+RUN chmod +x /app/AIWatch.x86_64
+
+# Espone le porte per Netcode for GameObjects e Debugger
 EXPOSE 7777/udp
+EXPOSE 8888/udp
+EXPOSE 5000-5500/udp
 EXPOSE 27015/tcp
+EXPOSE 55000-55063/tcp
 
-# Avvia il server e accedi ai file dal volume condiviso
-CMD ["./AIWatch", "-batchmode", "-nographics", "-logfile", "/app/log.txt"]
+# Avvia il server Unity
+ENTRYPOINT ["./AIWatch.x86_64", "-batchmode", "-nographics"]
