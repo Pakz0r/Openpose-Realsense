@@ -17,11 +17,12 @@
     <meta-data android:name="unityplayer.SkipPermissionsDialog" android:value="false" />
     <meta-data android:name="com.samsung.android.vr.application.mode" android:value="vr_only" />
     <meta-data android:name="com.oculus.ossplash.background" android:value="black" />
-    <meta-data android:name="com.oculus.supportedDevices"
-      android:value="quest|quest2|questpro|quest3|quest3s" tools:replace="android:value" />
+    <meta-data android:name="com.oculus.handtracking.enabled" android:value="false"/>
+    <meta-data android:name="com.oculus.controllertracking.enabled" android:value="false"/>
+    <meta-data android:name="com.oculus.systemux.headset_only_mode" android:value="true"/>
+    <meta-data android:name="com.oculus.supportedDevices" android:value="quest|quest2|questpro|quest3|quest3s" tools:replace="android:value" />
   </application>
-  <uses-feature android:name="android.hardware.vr.headtracking" android:version="1"
-    android:required="true" />
+  <uses-feature android:name="android.hardware.vr.headtracking" android:version="1" android:required="true" />
   <uses-feature android:name="android.hardware.vr.controller" android:required="false" />
   <uses-permission android:name="android.permission.INTERNET" android:required="true" />
 </manifest>

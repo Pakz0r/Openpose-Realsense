@@ -41,7 +41,7 @@
                     "Folder": ".\\Sensors\\Home",
                     "Transform": {
                         "Position": {
-                            "x": 0.62,
+                            "x": 0.2,
                             "y": 0.85,
                             "z": 2.15
                         },
@@ -54,7 +54,7 @@
                     "Offset": {
                         "Position": {
                             "x": 0,
-                            "y": 0.25,
+                            "y": 0,
                             "z": 0
                         },
                         "Rotation": {
