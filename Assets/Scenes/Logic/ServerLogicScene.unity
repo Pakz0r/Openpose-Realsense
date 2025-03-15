@@ -224,6 +224,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d8ad9c4991e630418e306d3c07412d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  environmentScene: 
+  sensorRegistered: 0
+  simulatedFrameCount: 0
   frameId: 34
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
