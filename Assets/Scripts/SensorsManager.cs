@@ -72,7 +72,10 @@ public class SensorsManager : MonoBehaviour
                 );
 
                 // add camera to check frames result
-                sensorObject.AddComponent<Camera>();
+                var camera = sensorObject.AddComponent<Camera>();
+                camera.fieldOfView = 58; // Intel Realsense D435i has 58° of vertical fov
+                camera.nearClipPlane = 0.1f;
+                camera.farClipPlane = 10.0f;
 
                 // apply sensor offset
                 var sensorOffset = new GameObject("Offset");

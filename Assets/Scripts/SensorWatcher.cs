@@ -101,12 +101,12 @@ public class SensorWatcher : MonoBehaviour
 
         Debug.Log($"Frame {currentFrame.ID_Frame} readed for '{currentFrame.thingId}'");
 
-        FrameReaded?.Invoke(this, currentFrame);
-
         foreach (var person in currentFrame.People)
         {
             PersonUpdated?.Invoke(this, person);
         }
+
+        FrameReaded?.Invoke(this, currentFrame);
     }
     #endregion
 }

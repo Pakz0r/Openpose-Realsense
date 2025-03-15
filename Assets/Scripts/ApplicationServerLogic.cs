@@ -38,11 +38,13 @@ public class ApplicationServerLogic : MonoBehaviour
 
         networkManager.StartServer();
         SensorWatcher.PersonUpdated.AddListener(DrawPerson);
+        SensorWatcher.FrameReaded.AddListener(DestroyNonUpdatedPerson);
     }
 
     private void OnDisable()
     {
         SensorWatcher.PersonUpdated.RemoveAllListeners();
+        SensorWatcher.FrameReaded.RemoveAllListeners();
     }
     #endregion
 
@@ -173,7 +175,7 @@ public class ApplicationServerLogic : MonoBehaviour
 
         if (useHeadData)
         {
-            if (headBoneData.confidence > ApplicationConfig.Instance.MinConfidence)
+            if (headBoneData.confidence >= ApplicationConfig.Instance.MinConfidence)
             {
                 // update rigPosition only if confidence is over minimum
                 rigPosition = new Vector3(headBoneData.x, 0.0f, headBoneData.z);
@@ -184,7 +186,7 @@ public class ApplicationServerLogic : MonoBehaviour
                 hipBoneData.z = rigPosition.z; // align hip to rig position
             }
         }
-        else if (hipBoneData.confidence > ApplicationConfig.Instance.MinConfidence)
+        else if (hipBoneData.confidence >= ApplicationConfig.Instance.MinConfidence)
         {
             // update rigPosition only if confidence is over minimum
             rigPosition = new Vector3(hipBoneData.x, hipBoneData.y, hipBoneData.z);
@@ -274,6 +276,21 @@ public class ApplicationServerLogic : MonoBehaviour
             // update network bone rotation weight
             if (boneObject.TryGetComponent<NetworkBoneSynchronization>(out var networkBone))
                 networkBone.SetWeightRotation(weight);
+        }
+    }
+
+    private void DestroyNonUpdatedPerson(SensorWatcher sender, FrameSkeletonsPoints3D frame)
+    {
+        foreach (var name in peoples.Keys.ToList())
+        {
+            var person = frame.People.FirstOrDefault((person) => name == $"Person {person.personID}");
+
+            if (person == null)
+            {
+                Debug.Log($"{name} has been removed from the scene");
+                Destroy(peoples[name]);
+                peoples.Remove(name);
+            }
         }
     }
     #endregion
