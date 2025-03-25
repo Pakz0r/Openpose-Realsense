@@ -193,7 +193,7 @@ public class ApplicationServerLogic : MonoBehaviour
         }
 
         // eval rig rotation from face rotation (angles are evaluated into the direction of the camera so are 180° wrong)
-        var rigRotation = Quaternion.Euler(0.0f, rotation.yaw + 180f, 0.0f);
+        var rigRotation = Quaternion.Euler(0.0f, 180f - rotation.yaw, 0.0f);
 
         // update person transform
         personTransform.SetLocalPositionAndRotation(rigPosition, rigRotation);
