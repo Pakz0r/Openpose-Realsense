@@ -74,6 +74,8 @@ public static class OpenPoseBoneUtilities
         [OpenPoseBone.RightLowerLeg] = OpenPoseBone.RightFoot,
         [OpenPoseBone.LeftUpperLeg] = OpenPoseBone.LeftLowerLeg,
         [OpenPoseBone.LeftLowerLeg] = OpenPoseBone.LeftFoot,
+        [OpenPoseBone.UpperChest] = OpenPoseBone.Head,
+        [OpenPoseBone.Hips] = OpenPoseBone.UpperChest,
     };
 
     private static readonly Dictionary<OpenPoseBone, OpenPoseBone> followDirectionOfDict = new()

@@ -198,6 +198,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boneId: 0
   targetBone: {fileID: 0}
+  followedBone: {fileID: 0}
 --- !u!1 &654912527174733744
 GameObject:
   m_ObjectHideFlags: 0
@@ -423,6 +424,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boneId: 0
   targetBone: {fileID: 0}
+  followedBone: {fileID: 0}
 --- !u!1 &1657733384283952475
 GameObject:
   m_ObjectHideFlags: 0
@@ -523,6 +525,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boneId: 0
   targetBone: {fileID: 0}
+  followedBone: {fileID: 0}
 --- !u!1 &1709249861527884743
 GameObject:
   m_ObjectHideFlags: 0
@@ -776,6 +779,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boneId: 0
   targetBone: {fileID: 0}
+  followedBone: {fileID: 0}
 --- !u!1 &1773624861497319527
 GameObject:
   m_ObjectHideFlags: 0
@@ -1740,6 +1744,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boneId: 0
   targetBone: {fileID: 0}
+  followedBone: {fileID: 0}
 --- !u!1 &3502720518751041771
 GameObject:
   m_ObjectHideFlags: 0
@@ -2096,6 +2101,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boneId: 0
   targetBone: {fileID: 0}
+  followedBone: {fileID: 0}
 --- !u!1 &4615148584388477243
 GameObject:
   m_ObjectHideFlags: 0
@@ -2196,6 +2202,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boneId: 0
   targetBone: {fileID: 0}
+  followedBone: {fileID: 0}
 --- !u!1 &4717100028523145661
 GameObject:
   m_ObjectHideFlags: 0
@@ -2226,7 +2233,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4717100028523145661}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2250,7 +2257,7 @@ Animator:
   m_Controller: {fileID: 9100000, guid: 408f4415dba887441acd4dc76e213942, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_WarningMessage: 
@@ -2369,8 +2376,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 697157395
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 930335307
+  InScenePlacedSourceGlobalObjectIdHash: 930335307
   AlwaysReplicateAsRoot: 1
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -2586,6 +2593,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boneId: 0
   targetBone: {fileID: 0}
+  followedBone: {fileID: 0}
 --- !u!1 &5190632809128918220
 GameObject:
   m_ObjectHideFlags: 0
@@ -2718,6 +2726,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boneId: 0
   targetBone: {fileID: 0}
+  followedBone: {fileID: 0}
 --- !u!1 &5591075704663939605
 GameObject:
   m_ObjectHideFlags: 0
@@ -3074,6 +3083,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boneId: 0
   targetBone: {fileID: 0}
+  followedBone: {fileID: 0}
 --- !u!1 &6855210829389046529
 GameObject:
   m_ObjectHideFlags: 0
@@ -3441,6 +3451,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boneId: 0
   targetBone: {fileID: 0}
+  followedBone: {fileID: 0}
 --- !u!1 &7487904612651816684
 GameObject:
   m_ObjectHideFlags: 0
@@ -3705,6 +3716,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boneId: 0
   targetBone: {fileID: 0}
+  followedBone: {fileID: 0}
 --- !u!1 &7848826948353793250
 GameObject:
   m_ObjectHideFlags: 0
@@ -3805,6 +3817,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boneId: 0
   targetBone: {fileID: 0}
+  followedBone: {fileID: 0}
 --- !u!1 &7950091361302372114
 GameObject:
   m_ObjectHideFlags: 0
@@ -4269,6 +4282,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boneId: 0
   targetBone: {fileID: 0}
+  followedBone: {fileID: 0}
 --- !u!1 &8670959064997162975
 GameObject:
   m_ObjectHideFlags: 0
@@ -4401,6 +4415,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boneId: 0
   targetBone: {fileID: 0}
+  followedBone: {fileID: 0}
 --- !u!1 &8813705252017693076
 GameObject:
   m_ObjectHideFlags: 0

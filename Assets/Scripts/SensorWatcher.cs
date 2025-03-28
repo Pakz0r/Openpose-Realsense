@@ -7,6 +7,7 @@ using Utilities.Parser;
 using OpenPose;
 
 using static SensorsManager;
+using UnityEngine.UI;
 
 public class SensorWatcher : MonoBehaviour
 {
@@ -101,8 +102,18 @@ public class SensorWatcher : MonoBehaviour
 
         Debug.Log($"Frame {currentFrame.ID_Frame} readed for '{currentFrame.thingId}'");
 
+        var sensorPosition = this.transform.position;
+
         foreach (var person in currentFrame.People)
         {
+            foreach(var bone in person.skeleton)
+            {
+                var direction = sensorPosition + transform.TransformDirection(bone.x, bone.y, bone.z);
+                bone.x = direction.x;
+                bone.y = direction.y;
+                bone.z = direction.z;
+            }
+
             PersonUpdated?.Invoke(this, person);
         }
 

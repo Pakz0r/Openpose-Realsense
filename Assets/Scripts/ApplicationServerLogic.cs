@@ -61,7 +61,7 @@ public class ApplicationServerLogic : MonoBehaviour
         var avgConfidence = personData.skeleton.Average((bone) => bone.confidence);
         Debug.Log($"Person {personData.personID} new frame average confidence: {avgConfidence}");
 
-        if(avgConfidence < ApplicationConfig.Instance.MinConfidence)
+        if (avgConfidence < ApplicationConfig.Instance.MinConfidence)
         {
             if (ExistsPerson(personData.personID))
             {
@@ -77,16 +77,13 @@ public class ApplicationServerLogic : MonoBehaviour
         }
 
         // create person if not exists
-        var personObject = CreatePersonIfNotExists(personData.personID);
+        var personObject = CreatePersonIfNotExists(personData.personID, sender.transform);
 
         if (personObject == null)
         {
             Debug.LogError("Cannot find person object");
             return;
         }
-
-        // update person transform parent
-        personObject.transform.SetParent(sender.transform);
 
         // update person transform
         UpdatePersonObjectTransform(personObject, ref personData.skeleton, personData.face_rotation);
@@ -103,7 +100,7 @@ public class ApplicationServerLogic : MonoBehaviour
         // update person rig to match bone and mesh rotation (because the room may have a rotation offset)
         personRig.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(sender.Info.Offset.Rotation));
 
-        UpdateRigPositionConstraints(personRig.transform, personData.skeleton, personObject.transform.localPosition);
+        UpdateRigPositionConstraints(personRig.transform, personData.skeleton);
         UpdateRigRotationConstraints(personRig.transform);
 
         if (personObject.TryGetComponent<NetworkPersonBehaviour>(out var behaviour))
@@ -113,14 +110,18 @@ public class ApplicationServerLogic : MonoBehaviour
         }
     }
 
-    private GameObject CreatePersonIfNotExists(int personID)
+    private GameObject CreatePersonIfNotExists(int personID, Transform parent)
     {
         var personName = $"Person {personID}";
 
         if (peoples.ContainsKey(personName))
+        {
+            // update person transform parent
+            peoples[personName].transform.SetParent(parent);
             return peoples[personName];
+        }
 
-        var personObject = CreatePerson(personID);
+        var personObject = CreatePerson(personID, parent);
         peoples[personName] = personObject;
 
         var label = personObject.GetComponentInChildren<PlayerNameBillboard>();
@@ -146,13 +147,13 @@ public class ApplicationServerLogic : MonoBehaviour
         return peoples.Remove(personName);
     }
 
-    private GameObject CreatePerson(int personID)
+    private GameObject CreatePerson(int personID, Transform parent)
     {
         if (personPrefab == null)
             return null;
 
         // create person from prefab
-        var personObject = GameObject.Instantiate(personPrefab);
+        var personObject = GameObject.Instantiate(personPrefab, parent);
         personObject.name = $"Person {personID}";
 
         // spawn network object
@@ -178,29 +179,25 @@ public class ApplicationServerLogic : MonoBehaviour
             if (headBoneData.confidence >= ApplicationConfig.Instance.MinConfidence)
             {
                 // update rigPosition only if confidence is over minimum
-                rigPosition = new Vector3(headBoneData.x, 0.0f, headBoneData.z);
-
-                // if head data is used, prevent hip bone to move the body because it's the root object
-                hipBoneData.x = rigPosition.x; // align hip to rig position
-                hipBoneData.y = rigPosition.y; // align hip to rig position
-                hipBoneData.z = rigPosition.z; // align hip to rig position
+                rigPosition = new Vector3(headBoneData.x, 1f, headBoneData.z);
             }
         }
         else if (hipBoneData.confidence >= ApplicationConfig.Instance.MinConfidence)
         {
             // update rigPosition only if confidence is over minimum
-            rigPosition = new Vector3(hipBoneData.x, hipBoneData.y, hipBoneData.z);
+            rigPosition = new Vector3(hipBoneData.x, 1f, hipBoneData.z);
         }
 
         // eval rig rotation from face rotation (angles are evaluated into the direction of the camera so are 180° wrong)
         var rigRotation = Quaternion.Euler(0.0f, 180f - rotation.yaw, 0.0f);
 
         // update person transform
-        personTransform.SetLocalPositionAndRotation(rigPosition, rigRotation);
+        personTransform.position = rigPosition;
+        personTransform.localRotation = rigRotation;
         personTransform.localScale = Vector3.one;
     }
 
-    private static void UpdateRigPositionConstraints(Transform parentRig, BoneData[] skeleton, Vector3 rigPosition)
+    private static void UpdateRigPositionConstraints(Transform parentRig, BoneData[] skeleton)
     {
         foreach (Transform boneObject in parentRig)
         {
@@ -211,7 +208,7 @@ public class ApplicationServerLogic : MonoBehaviour
             var boneData = skeleton.FirstOrDefault(bone => bone.pointID == (int)boneId);
 
             // apply bone position
-            boneObject.localPosition = new Vector3(boneData.x, boneData.y, boneData.z) - rigPosition;
+            boneObject.position = new Vector3(boneData.x, boneData.y, boneData.z);
 
             if (boneObject.TryGetComponent<NetworkBoneSynchronization>(out var networkBone))
             {
@@ -248,7 +245,10 @@ public class ApplicationServerLogic : MonoBehaviour
 
                     // update bone rotation constraint weight based on target weight
                     if (bone.TryGetComponent<OverrideTransform>(out var constraint))
-                        weight = constraint.weight;
+                    {
+                        // use distance to prevent bone compenetration caused by wrong angle representation
+                        weight = Vector3.Distance(boneObject.position, bone.position) < 0.1 ? 0f : constraint.weight;
+                    }
 
                     break;
                 }

@@ -101,7 +101,7 @@ public class SensorSimulator : MonoBehaviour
         }
 
         var simulatedFiles = simulationFolderInfo.GetFiles()
-            .Where((info) => !info.Name.Contains(".meta"))
+            .Where((info) => info.Name.EndsWith(".json"))
             .ToList();
 
         if (simulatedFiles.Count == 0)

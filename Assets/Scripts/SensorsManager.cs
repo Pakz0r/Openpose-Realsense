@@ -80,13 +80,8 @@ public class SensorsManager : MonoBehaviour
                 // apply sensor offset
                 var sensorOffset = new GameObject("Offset");
                 sensorOffset.transform.SetParent(sensorObject.transform);
-
-                sensor.Offset.Position.y = 1f - sensor.Transform.Position.y; // the sum of Y position and offset must be 1.0
-
-                sensorOffset.transform.SetLocalPositionAndRotation(
-                    new Vector3(sensor.Offset.Position.x, sensor.Offset.Position.y, sensor.Offset.Position.z),
-                    Quaternion.identity
-                );
+                sensorOffset.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+                sensorOffset.transform.localScale = Vector3.one;
 
                 // invoke sensor created event
                 SensorCreated?.Invoke(sensor);

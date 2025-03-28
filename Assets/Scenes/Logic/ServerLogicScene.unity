@@ -227,7 +227,7 @@ MonoBehaviour:
   environmentScene: 
   sensorRegistered: 0
   simulatedFrameCount: 0
-  frameId: 34
+  frameId: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

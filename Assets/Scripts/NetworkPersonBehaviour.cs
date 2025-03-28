@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
 
 [RequireComponent(typeof(Animator))]
 public class NetworkPersonBehaviour : NetworkBehaviour
