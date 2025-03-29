@@ -88,11 +88,8 @@ public class ApplicationServerLogic : MonoBehaviour
             return;
         }
 
-        // optimize the pose
-        poseGraphOptimizator.Optimize(ref personData.skeleton);
-
         // update person transform
-        UpdatePersonObjectTransform(personObject, ref personData.skeleton, personData.face_rotation);
+        UpdatePersonObjectTransform(personObject, personData.skeleton, personData.face_rotation);
 
         // get person object rig
         Rig personRig = personObject.GetComponentInChildren<Rig>();
@@ -102,6 +99,9 @@ public class ApplicationServerLogic : MonoBehaviour
             Debug.LogError("Invalid person rig");
             return;
         }
+
+        // optimize the pose
+        poseGraphOptimizator.Optimize(ref personData.skeleton, personRig.transform.position);
 
         // update person rig to match bone and mesh rotation (because the room may have a rotation offset)
         personRig.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.Euler(sender.Info.Offset.Rotation));
@@ -169,7 +169,7 @@ public class ApplicationServerLogic : MonoBehaviour
         return personObject;
     }
 
-    private static void UpdatePersonObjectTransform(GameObject personObject, ref BoneData[] skeleton, FaceRotation rotation)
+    private static void UpdatePersonObjectTransform(GameObject personObject, BoneData[] skeleton, FaceRotation rotation)
     {
         var personTransform = personObject.transform;
 

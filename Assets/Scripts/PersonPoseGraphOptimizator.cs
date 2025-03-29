@@ -9,25 +9,29 @@ public class PersonPoseGraphOptimizator
 {
     private readonly static (OpenPoseBone, OpenPoseBone)[] openposeLimbDiffKeyId =
     {
+        // spine
         (OpenPoseBone.Head, OpenPoseBone.UpperChest),
         (OpenPoseBone.UpperChest, OpenPoseBone.Hips),
-
+        // right arm
         (OpenPoseBone.UpperChest, OpenPoseBone.RightShoulder),
         (OpenPoseBone.RightShoulder, OpenPoseBone.RightLowerArm),
         (OpenPoseBone.RightLowerArm, OpenPoseBone.RightHand),
-
+        // left arm
         (OpenPoseBone.UpperChest, OpenPoseBone.LeftShoulder),
         (OpenPoseBone.LeftShoulder, OpenPoseBone.LeftLowerArm),
         (OpenPoseBone.LeftLowerArm, OpenPoseBone.LeftHand),
-        
+        // body
         (OpenPoseBone.RightShoulder, OpenPoseBone.LeftShoulder),
         (OpenPoseBone.RightShoulder, OpenPoseBone.RightUpperLeg),
         (OpenPoseBone.LeftShoulder, OpenPoseBone.LeftLowerLeg),
-
+        // neck
+        (OpenPoseBone.RightShoulder, OpenPoseBone.Head),
+        (OpenPoseBone.LeftShoulder, OpenPoseBone.Head),
+        // right leg
         (OpenPoseBone.Hips, OpenPoseBone.RightUpperLeg),
         (OpenPoseBone.RightUpperLeg, OpenPoseBone.RightLowerLeg),
         (OpenPoseBone.RightLowerLeg, OpenPoseBone.RightFoot),
-
+        // left leg
         (OpenPoseBone.Hips, OpenPoseBone.LeftUpperLeg),
         (OpenPoseBone.LeftUpperLeg, OpenPoseBone.LeftLowerLeg),
         (OpenPoseBone.LeftLowerLeg, OpenPoseBone.LeftFoot),
@@ -47,8 +51,11 @@ public class PersonPoseGraphOptimizator
         }
     }
 
-    private const int LIMB_ARRAY_SIZE = 15;
-    private List<PoseConstraint> constraints = new();
+    private const int limbSizeArray = 15;
+    private const float defaultPoseConfidence = 0.75f;
+    private const float confidenceTreshold = 0.2f;
+    private readonly List<PoseConstraint> constraints = new();
+    private readonly LevenbergMarquardtMinimizer optimizer = new();
 
     public PersonPoseGraphOptimizator(GameObject personPrefab)
     {
@@ -58,7 +65,8 @@ public class PersonPoseGraphOptimizator
         if (!personPrefab.TryGetComponent<Animator>(out var animator))
             throw new Exception("Animator object not found");
 
-        Transform[] bodyParts = new Transform[LIMB_ARRAY_SIZE];
+        // Raccolta delle informazioni iniziali sulla posizione del digital twin
+        Transform[] bodyParts = new Transform[limbSizeArray];
 
         bodyParts[0] = animator.GetBoneTransform(HumanBodyBones.Head);
         bodyParts[1] = animator.GetBoneTransform(HumanBodyBones.UpperChest);
@@ -76,6 +84,7 @@ public class PersonPoseGraphOptimizator
         bodyParts[13] = animator.GetBoneTransform(HumanBodyBones.LeftLowerLeg);
         bodyParts[14] = animator.GetBoneTransform(HumanBodyBones.LeftFoot);
 
+        // Creazione dei vincoli in base alla posa iniziale del digital twin (T-Pose)
         foreach (var limbs in openposeLimbDiffKeyId)
         {
             var distance = Vector3.Distance(bodyParts[(int)limbs.Item1].position, bodyParts[(int)limbs.Item2].position);
@@ -84,18 +93,20 @@ public class PersonPoseGraphOptimizator
         }
     }
 
-    public void Optimize(ref BoneData[] skeleton)
+    public void Optimize(ref BoneData[] skeleton, Vector3 initPosition)
     {
-        // Costruzione della soluzione iniziale
-        var initialGuess = Vector<double>.Build.Dense(LIMB_ARRAY_SIZE * 3);
+        // Costruzione della soluzione iniziale (posa ricevuta da openpose)
+        var initialGuess = Vector<double>.Build.Dense(limbSizeArray * 3);
 
-        for (int i = 0; i < LIMB_ARRAY_SIZE; i++)
+        for (int i = 0; i < limbSizeArray; i++)
         {
-            var bone = new double[] { 0f, 0f, 0f };
+            var bone = new double[] { initPosition.x, 0f, initPosition.z };
 
-            if (skeleton[i].confidence > 0.2f)
+            if (skeleton[i].confidence > confidenceTreshold)
             {
-                bone = new double[] { skeleton[i].x, skeleton[i].y, skeleton[i].z };
+                bone[0] = skeleton[i].x;
+                bone[1] = skeleton[i].y;
+                bone[2] = skeleton[i].z;
             }
 
             var guess = Vector<double>.Build.DenseOfArray(bone);
@@ -111,24 +122,23 @@ public class PersonPoseGraphOptimizator
         );
 
         // Creazione del solver Levenberg-Marquardt
-        var optimizer = new LevenbergMarquardtMinimizer();
         var result = optimizer.FindMinimum(objectiveFunction, initialGuess);
 
         // Visualizziamo i risultati
-        for (int i = 0; i < LIMB_ARRAY_SIZE; i++)
+        for (int i = 0; i < limbSizeArray; i++)
         {
             var bone = skeleton[i];
             var position = result.MinimizingPoint.SubVector(i * 3, 3);
             bone.x = (float)position[0];
             bone.y = (float)position[1];
             bone.z = (float)position[2];
-            bone.confidence = Mathf.Clamp01(bone.confidence + 0.5f);
+            bone.confidence = defaultPoseConfidence; // Impongo che le nuove ossa hanno una confidence di default
         }
     }
 
     private Vector<double> ComputeResiduals(Vector<double> x)
     {
-        double tolerance = 0.01f;
+        double toleranceFactor = 0.1; // Tolleranza sulla lunghezza dell'arto
         var residuals = Vector<double>.Build.Dense(constraints.Count);
 
         for (int i = 0; i < constraints.Count; i++)
@@ -140,8 +150,13 @@ public class PersonPoseGraphOptimizator
             var toPose = x.SubVector(toIndex * 3, 3);
 
             double currentDistance = (fromPose - toPose).L2Norm();
-            double diff = Math.Max(0, Math.Abs(currentDistance - constraints[i].Distance) - tolerance);
-            residuals[i] = diff * diff;
+            double targetDistance = constraints[i].Distance;
+            double tolerance = targetDistance * toleranceFactor;
+
+            // Penalizzazione morbida se la distanza eccede la tolleranza
+            double penalty = Math.Max(0, Math.Abs(currentDistance - targetDistance) - tolerance);
+
+            residuals[i] = currentDistance - targetDistance + penalty;
         }
 
         return residuals;
