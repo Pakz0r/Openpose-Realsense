@@ -18,6 +18,7 @@ public class ApplicationServerLogic : MonoBehaviour
     #region Private Fields
     private NetworkManager networkManager;
     private Dictionary<string, GameObject> peoples = new();
+    private PersonPoseGraphOptimizator poseGraphOptimizator;
     #endregion
 
     #region Unity Lifecycle
@@ -35,6 +36,8 @@ public class ApplicationServerLogic : MonoBehaviour
                 networkTransport.ConnectionData.Port = ApplicationConfig.Instance.ServerPort;
             }
         }
+
+        poseGraphOptimizator = new PersonPoseGraphOptimizator(personPrefab);
 
         networkManager.StartServer();
         SensorWatcher.PersonUpdated.AddListener(DrawPerson);
@@ -84,6 +87,9 @@ public class ApplicationServerLogic : MonoBehaviour
             Debug.LogError("Cannot find person object");
             return;
         }
+
+        // optimize the pose
+        poseGraphOptimizator.Optimize(ref personData.skeleton);
 
         // update person transform
         UpdatePersonObjectTransform(personObject, ref personData.skeleton, personData.face_rotation);

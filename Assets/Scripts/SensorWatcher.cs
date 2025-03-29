@@ -108,7 +108,7 @@ public class SensorWatcher : MonoBehaviour
         {
             foreach(var bone in person.skeleton)
             {
-                var direction = sensorPosition + transform.TransformDirection(bone.x, bone.y, bone.z);
+                var direction = sensorPosition + transform.TransformDirection(bone.x, bone.y + 0.3f, bone.z);
                 bone.x = direction.x;
                 bone.y = direction.y;
                 bone.z = direction.z;
