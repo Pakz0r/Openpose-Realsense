@@ -8,6 +8,7 @@ namespace OpenPose
         public int ID_Frame;
         public string thingId;
         public PersonData[] People;
+        public bool Has_Fallen;
     }
 
     [Serializable]

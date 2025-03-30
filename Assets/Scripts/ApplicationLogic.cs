@@ -78,6 +78,7 @@ public class ApplicationLogic : MonoBehaviour
             Mode = applicationMode;
         }
 
+        // load environment scene
         if (!config.DisableEnvironmentScene && !string.IsNullOrEmpty(config.EnvironmentScene) && !IsSceneLoaded(config.EnvironmentScene))
             SceneManager.LoadScene(config.EnvironmentScene, LoadSceneMode.Additive);
 

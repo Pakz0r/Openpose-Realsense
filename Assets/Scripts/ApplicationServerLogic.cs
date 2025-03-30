@@ -19,9 +19,16 @@ public class ApplicationServerLogic : MonoBehaviour
     private NetworkManager networkManager;
     private Dictionary<string, GameObject> peoples = new();
     private PersonPoseGraphOptimizator poseGraphOptimizator;
+    private NetworkRoomBehaviour networkRoom;
     #endregion
 
     #region Unity Lifecycle
+    private void Awake()
+    {
+        poseGraphOptimizator = new PersonPoseGraphOptimizator(personPrefab);
+        networkRoom = GameObject.FindAnyObjectByType<NetworkRoomBehaviour>();
+    }
+
     private void OnEnable()
     {
         networkManager = ApplicationLogic.GetNetworkManager();
@@ -36,8 +43,6 @@ public class ApplicationServerLogic : MonoBehaviour
                 networkTransport.ConnectionData.Port = ApplicationConfig.Instance.ServerPort;
             }
         }
-
-        poseGraphOptimizator = new PersonPoseGraphOptimizator(personPrefab);
 
         networkManager.StartServer();
         SensorWatcher.PersonUpdated.AddListener(DrawPerson);
@@ -297,6 +302,11 @@ public class ApplicationServerLogic : MonoBehaviour
                 Destroy(peoples[name]);
                 peoples.Remove(name);
             }
+        }
+
+        if (networkRoom != null)
+        {
+            networkRoom.SetHasAnyFallen(frame.Has_Fallen);
         }
     }
     #endregion
