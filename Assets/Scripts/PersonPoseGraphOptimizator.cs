@@ -52,18 +52,28 @@ public class PersonPoseGraphOptimizator
     }
 
     private const int limbSizeArray = 15;
-    private const float defaultPoseConfidence = 0.75f;
-    private const float confidenceTreshold = 0.2f;
+    private readonly float defaultUpperBodyConfidence = 0.75f;
+    private readonly float defaultLowerBodyConfidence = 0.75f;
+    private readonly float confidenceTreshold = 0.2f;
+    private readonly double toleranceFactor = 0.05; // Tolleranza sulla lunghezza dell'arto
     private readonly List<PoseConstraint> constraints = new();
     private readonly LevenbergMarquardtMinimizer optimizer = new();
 
-    public PersonPoseGraphOptimizator(GameObject personPrefab)
+    public PersonPoseGraphOptimizator(GameObject personPrefab, float boneConfidenceThreshold = 0.2f, 
+        float newPoseUpperBodyConfidence = 0.75f, float newPoseLowerBodyConfidence = 0.75f,
+        double toleranceFactor = 0.05)
     {
         if (personPrefab == null)
             throw new Exception("Invalid person prefab");
 
         if (!personPrefab.TryGetComponent<Animator>(out var animator))
             throw new Exception("Animator object not found");
+
+        // Imposta le variabili per l'ottimizzatore
+        this.confidenceTreshold = boneConfidenceThreshold;
+        this.defaultUpperBodyConfidence = newPoseUpperBodyConfidence;
+        this.defaultLowerBodyConfidence = newPoseLowerBodyConfidence;
+        this.toleranceFactor = toleranceFactor;
 
         // Raccolta delle informazioni iniziali sulla posizione del digital twin
         Transform[] bodyParts = new Transform[limbSizeArray];
@@ -132,13 +142,14 @@ public class PersonPoseGraphOptimizator
             bone.x = (float)position[0];
             bone.y = (float)position[1];
             bone.z = (float)position[2];
-            bone.confidence = defaultPoseConfidence; // Impongo che le nuove ossa hanno una confidence di default
+
+            // Impongo la nuova confidence di default per le ossa
+            bone.confidence = (bone.pointID < (int)OpenPoseBone.Hips) ? defaultUpperBodyConfidence : defaultLowerBodyConfidence;
         }
     }
 
     private Vector<double> ComputeResiduals(Vector<double> x)
     {
-        double toleranceFactor = 0.1; // Tolleranza sulla lunghezza dell'arto
         var residuals = Vector<double>.Build.Dense(constraints.Count);
 
         for (int i = 0; i < constraints.Count; i++)
