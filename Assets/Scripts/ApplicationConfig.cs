@@ -74,24 +74,24 @@ public class ApplicationConfig : ScriptableObject
         if (configFileExists)
         {
             // json cannot serialize ScriptableObjects
-            var temp = await JSON.ParseFromFileAsync<Config>(filePath);
+            var config = await JSON.ParseFromFileAsync<Config>(filePath);
 
-            if (temp != null)
+            if (config != null)
             {
-                if (!string.IsNullOrEmpty(temp.Mode))
-                    Mode = temp.Mode;
+                if (!string.IsNullOrEmpty(config.Mode))
+                    Mode = config.Mode;
 
-                if (temp.MinConfidence >= 0f)
-                    MinConfidence = temp.MinConfidence;
+                if (config.MinConfidence >= 0f)
+                    MinConfidence = config.MinConfidence;
 
-                if (!string.IsNullOrEmpty(temp.EnvironmentScene))
-                    EnvironmentScene = temp.EnvironmentScene;
+                if (!string.IsNullOrEmpty(config.EnvironmentScene))
+                    EnvironmentScene = config.EnvironmentScene;
 
-                if (!string.IsNullOrEmpty(temp.ServerAddress))
-                    ServerAddress = temp.ServerAddress;
+                if (!string.IsNullOrEmpty(config.ServerAddress))
+                    ServerAddress = config.ServerAddress;
 
-                if (temp.ServerPort >= 0)
-                    ServerPort = temp.ServerPort;
+                if (config.ServerPort >= 0)
+                    ServerPort = config.ServerPort;
             }
         }
 
