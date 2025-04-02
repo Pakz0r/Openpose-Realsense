@@ -1,0 +1,192 @@
+{
+    "ID_Frame": 320,
+    "People": [
+        {
+            "face_rotation": {
+                "pitch": 0.0,
+                "yaw": 0.0,
+                "roll": 0.0
+            },
+            "personID": 0,
+            "skeleton": [
+                {
+                    "pointID": 0,
+                    "x": -0.0,
+                    "y": -0.0,
+                    "z": 0.0,
+                    "confidence": 0.8791388273239136
+                },
+                {
+                    "pointID": 1,
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0,
+                    "confidence": 0.39470526576042175
+                },
+                {
+                    "pointID": 2,
+                    "x": -0.0,
+                    "y": -0.0,
+                    "z": 0.0,
+                    "confidence": 0.2853204905986786
+                },
+                {
+                    "pointID": 3,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                },
+                {
+                    "pointID": 4,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                },
+                {
+                    "pointID": 5,
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0,
+                    "confidence": 0.29467055201530457
+                },
+                {
+                    "pointID": 6,
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0,
+                    "confidence": 0.10785282403230667
+                },
+                {
+                    "pointID": 7,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                },
+                {
+                    "pointID": 8,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                },
+                {
+                    "pointID": 9,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                },
+                {
+                    "pointID": 10,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                },
+                {
+                    "pointID": 11,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                },
+                {
+                    "pointID": 12,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                },
+                {
+                    "pointID": 13,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                },
+                {
+                    "pointID": 14,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                },
+                {
+                    "pointID": 15,
+                    "x": -0.0,
+                    "y": -0.0,
+                    "z": 0.0,
+                    "confidence": 0.7041752934455872
+                },
+                {
+                    "pointID": 16,
+                    "x": -0.0,
+                    "y": -0.0,
+                    "z": 0.0,
+                    "confidence": 0.980937659740448
+                },
+                {
+                    "pointID": 17,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                },
+                {
+                    "pointID": 18,
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0,
+                    "confidence": 0.9023947715759277
+                },
+                {
+                    "pointID": 19,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                },
+                {
+                    "pointID": 20,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                },
+                {
+                    "pointID": 21,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                },
+                {
+                    "pointID": 22,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                },
+                {
+                    "pointID": 23,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                },
+                {
+                    "pointID": 24,
+                    "x": -0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "confidence": 0.0
+                }
+            ]
+        }
+    ],
+    "thingId": "digitaltwin:Laboratorio_Corridoio:1",
+    "Has_Fallen": false
+}

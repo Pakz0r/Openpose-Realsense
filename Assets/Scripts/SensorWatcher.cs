@@ -7,7 +7,6 @@ using Utilities.Parser;
 using OpenPose;
 
 using static SensorsManager;
-using UnityEngine.UI;
 
 public class SensorWatcher : MonoBehaviour
 {
@@ -27,6 +26,7 @@ public class SensorWatcher : MonoBehaviour
 
     #region Private Fields
     private FileSystemWatcher watcher;
+    private bool isProcessing;
     #endregion
 
     #region Unity Lifecycle
@@ -39,7 +39,7 @@ public class SensorWatcher : MonoBehaviour
     #region Public Methods
     public void SetupWatcher(SensorInfo sensor)
     {
-        if(sensor == null)
+        if (sensor == null)
         {
             Debug.LogError("Sensor data is invalid");
             return;
@@ -98,6 +98,13 @@ public class SensorWatcher : MonoBehaviour
 
     private async void ReadFrameFromFile(string framePath)
     {
+        if (isProcessing)
+        {
+            Debug.Log("Received new frame while processing. Skipped!");
+            return;
+        }
+
+        isProcessing = true;
         currentFrame = await framePath.ParseFromFileAsync<FrameSkeletonsPoints3D>();
 
         Debug.Log($"Frame {currentFrame.ID_Frame} readed for '{currentFrame.thingId}'");
@@ -106,9 +113,9 @@ public class SensorWatcher : MonoBehaviour
 
         foreach (var person in currentFrame.People)
         {
-            foreach(var bone in person.skeleton)
+            foreach (var bone in person.skeleton)
             {
-                var direction = sensorPosition + transform.TransformDirection(bone.x, bone.y + 0.3f, bone.z);
+                var direction = sensorPosition + transform.TransformDirection(bone.x, bone.y, bone.z);
                 bone.x = direction.x;
                 bone.y = direction.y;
                 bone.z = direction.z;
@@ -118,6 +125,7 @@ public class SensorWatcher : MonoBehaviour
         }
 
         FrameReaded?.Invoke(this, currentFrame);
+        isProcessing = false;
     }
     #endregion
 }

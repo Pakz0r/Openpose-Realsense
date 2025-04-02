@@ -9,32 +9,20 @@ public class PersonPoseGraphOptimizator
 {
     private readonly static (OpenPoseBone, OpenPoseBone)[] openposeLimbDiffKeyId =
     {
-        // spine
-        (OpenPoseBone.Head, OpenPoseBone.UpperChest),
-        (OpenPoseBone.UpperChest, OpenPoseBone.Hips),
-        // right arm
-        (OpenPoseBone.UpperChest, OpenPoseBone.RightShoulder),
-        (OpenPoseBone.RightShoulder, OpenPoseBone.RightLowerArm),
-        (OpenPoseBone.RightLowerArm, OpenPoseBone.RightHand),
-        // left arm
-        (OpenPoseBone.UpperChest, OpenPoseBone.LeftShoulder),
-        (OpenPoseBone.LeftShoulder, OpenPoseBone.LeftLowerArm),
-        (OpenPoseBone.LeftLowerArm, OpenPoseBone.LeftHand),
-        // body
-        (OpenPoseBone.RightShoulder, OpenPoseBone.LeftShoulder),
-        (OpenPoseBone.RightShoulder, OpenPoseBone.RightUpperLeg),
-        (OpenPoseBone.LeftShoulder, OpenPoseBone.LeftLowerLeg),
-        // neck
-        (OpenPoseBone.RightShoulder, OpenPoseBone.Head),
-        (OpenPoseBone.LeftShoulder, OpenPoseBone.Head),
-        // right leg
+        (OpenPoseBone.Hips, OpenPoseBone.Head),
+        (OpenPoseBone.Hips, OpenPoseBone.UpperChest),
+        (OpenPoseBone.Hips, OpenPoseBone.LeftShoulder),
+        (OpenPoseBone.Hips, OpenPoseBone.LeftLowerArm),
+        (OpenPoseBone.Hips, OpenPoseBone.LeftHand),
+        (OpenPoseBone.Hips, OpenPoseBone.RightShoulder),
+        (OpenPoseBone.Hips, OpenPoseBone.RightLowerArm),
+        (OpenPoseBone.Hips, OpenPoseBone.RightHand),
         (OpenPoseBone.Hips, OpenPoseBone.RightUpperLeg),
-        (OpenPoseBone.RightUpperLeg, OpenPoseBone.RightLowerLeg),
-        (OpenPoseBone.RightLowerLeg, OpenPoseBone.RightFoot),
-        // left leg
+        (OpenPoseBone.Hips, OpenPoseBone.RightLowerLeg),
+        (OpenPoseBone.Hips, OpenPoseBone.RightFoot),
         (OpenPoseBone.Hips, OpenPoseBone.LeftUpperLeg),
-        (OpenPoseBone.LeftUpperLeg, OpenPoseBone.LeftLowerLeg),
-        (OpenPoseBone.LeftLowerLeg, OpenPoseBone.LeftFoot),
+        (OpenPoseBone.Hips, OpenPoseBone.LeftLowerLeg),
+        (OpenPoseBone.Hips, OpenPoseBone.LeftFoot),
     };
 
     public class PoseConstraint

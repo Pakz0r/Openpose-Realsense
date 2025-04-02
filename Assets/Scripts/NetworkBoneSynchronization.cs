@@ -3,7 +3,6 @@ using UnityEngine.Animations.Rigging;
 using UnityEngine;
 using Unity.Netcode;
 using System;
-using UnityEngine.Splines;
 
 [RequireComponent(typeof(OverrideTransform))]
 public class NetworkBoneSynchronization : NetworkBehaviour
@@ -23,7 +22,6 @@ public class NetworkBoneSynchronization : NetworkBehaviour
     private OverrideTransform constraint;
     private NetworkVariable<float> positionWeight = new();
     private NetworkVariable<float> rotationWeight = new();
-    private bool isSpine = false;
     #endregion
 
     #region Unity Lifecycle
@@ -38,9 +36,6 @@ public class NetworkBoneSynchronization : NetworkBehaviour
 
         // we are working only with rotations so ignore positions (except for the hips)
         constraint.data.positionWeight = this.name.Equals("Hips") ? 1f : 0f;
-
-        // check if this bone is part of the spine
-        isSpine = this.name.Equals("Hips") || this.name.Equals("UpperChest");
 
         // check for bone to look at
         var boneTargetId = boneId.GetLookAtBoneFrom();
@@ -112,8 +107,6 @@ public class NetworkBoneSynchronization : NetworkBehaviour
         {
             var direction = (targetBone.position - this.transform.position).normalized; // eval direction from bone to target
             this.transform.up = direction; // update the bone forward (up) to point at target bone
-
-            if (isSpine) this.transform.Rotate(0f, 180f, 0f);
         }
 
         if (followedBone != null)

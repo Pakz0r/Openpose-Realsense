@@ -26,7 +26,7 @@ public class ApplicationLogic : MonoBehaviour
     }
     #endregion
 
-    #region Serialize Fieldsù
+    #region Serialize Fields
     [Header("Application Setup")]
     [SerializeField]
     private ApplicationConfig config;
