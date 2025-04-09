@@ -26,7 +26,7 @@ public class ApplicationServerLogic : MonoBehaviour
     private void Awake()
     {
         // setting low confidence for lower body bones because of FootIK
-        poseGraphOptimizator = new PersonPoseGraphOptimizator(personPrefab, ApplicationConfig.Instance.MinConfidence, 1f, 0.5f);
+        poseGraphOptimizator = new PersonPoseGraphOptimizator(personPrefab, ApplicationConfig.Instance.MinConfidence, 0.9f, 0.4f);
         networkRoom = GameObject.FindAnyObjectByType<NetworkRoomBehaviour>();
     }
 

@@ -112,7 +112,6 @@ public class NetworkBoneSynchronization : NetworkBehaviour
         if (followedBone != null)
         {
             this.transform.up = followedBone.up;
-            this.transform.Rotate(0f, 180f, 0f);
         }
 
         if (constraint != null)
